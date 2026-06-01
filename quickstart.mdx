@@ -1,47 +1,290 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Quickstart — Extract Your First Energy Bill in 60 Seconds"
+sidebarTitle: "Quickstart guide"
+description: "Send your first energy bill and get structured JSON back in under a minute. Code examples in Python, Node.js, and cURL for the Termina bill data extraction API."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
+# Quickstart
 
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+Extract structured data from an energy bill in three steps. You'll have clean JSON with usage, charges, tariff rates, and 30+ other fields in under 60 seconds.
 
-## Prerequisites
+<Info>
+  **Free tier** — 50 API credits, no credit card required. Each credit processes one bill page.
+</Info>
 
-Before you begin, you must have:
+## 1. Get your API key
 
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
+Sign up at [app.termina.io](https://app.termina.io) to generate your free API key instantly. No credit card, no approval process.
 
-## Get started
+Your key will look like this:
 
-<Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+```
+tmn_live_a1b2c3d4e5f6...
+```
 
-    ```bash
-    npm install your-package
-    ```
-  </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+<Warning>
+  Keep your API key private. Do not commit it to version control or expose it in client-side code.
+</Warning>
 
-    ```bash
-    your-cli init
-    ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+## 2. Send your first bill
 
-    ```bash
-    your-cli start
-    ```
-  </Step>
-</Steps>
+POST an energy bill PDF to the extract endpoint. The API accepts electricity, gas, and LPG bills from any retailer across Australia, NZ, UK, USA, and Canada.
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+<CodeGroup>
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.termina.io/v1/extract",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    files={"file": open("energy_bill.pdf", "rb")}
+)
+
+data = response.json()
+print(data)
+```
+
+```javascript Node.js
+import fs from "fs";
+
+const form = new FormData();
+form.append("file", fs.createReadStream("energy_bill.pdf"));
+
+const response = await fetch("https://api.termina.io/v1/extract", {
+  method: "POST",
+  headers: { "X-API-Key": "YOUR_API_KEY" },
+  body: form,
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+```bash cURL
+curl -X POST https://api.termina.io/v1/extract \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -F "file=@energy_bill.pdf"
+```
+
+</CodeGroup>
+
+### Request details
+
+| Parameter | Type | Description |
+|---|---|---|
+| `file` | `multipart/form-data` | The energy bill file. Accepted formats: PDF, JPEG, PNG, TIFF. |
+
+The endpoint automatically detects the energy type (electricity, gas, or LPG), the retailer, and the bill layout. No configuration or parameters needed beyond the file itself.
+
+## 3. Get structured JSON back
+
+The API returns structured data with 30+ fields organised into clear sections. Here's an example response from an electricity bill:
+
+```json Example response
+{
+  "status": "success",
+  "bill_type": "elec",
+  "retailer": "Origin Energy",
+  "account": {
+    "account_number": "6102-4471-8823",
+    "nmi": "6305012847",
+    "customer_name": "Acme Holdings Pty Ltd",
+    "supply_address": "123 Collins Street, Melbourne VIC 3000"
+  },
+  "billing_period": {
+    "start": "2026-01-15",
+    "end": "2026-04-14",
+    "days": 90
+  },
+  "usage": {
+    "total_kwh": 2847.5,
+    "peak_kwh": 1423.8,
+    "off_peak_kwh": 1138.2,
+    "shoulder_kwh": 285.5,
+    "demand_kw": 42.0,
+    "meter_reads": [
+      {
+        "meter_id": "E1Q1",
+        "previous": 48210,
+        "current": 51058,
+        "units": "kWh"
+      }
+    ]
+  },
+  "charges": [
+    {
+      "description": "Peak usage",
+      "classification": "retail",
+      "quantity": 1423.8,
+      "unit": "kWh",
+      "rate": 0.2860,
+      "amount": 407.21,
+      "tariff_type": "time_of_use",
+      "time_period": "peak"
+    },
+    {
+      "description": "Off-peak usage",
+      "classification": "retail",
+      "quantity": 1138.2,
+      "unit": "kWh",
+      "rate": 0.1540,
+      "amount": 175.28,
+      "tariff_type": "time_of_use",
+      "time_period": "off_peak"
+    },
+    {
+      "description": "Shoulder usage",
+      "classification": "retail",
+      "quantity": 285.5,
+      "unit": "kWh",
+      "rate": 0.2180,
+      "amount": 62.24,
+      "tariff_type": "time_of_use",
+      "time_period": "shoulder"
+    },
+    {
+      "description": "Supply charge",
+      "classification": "retail",
+      "quantity": 90,
+      "unit": "days",
+      "rate": 0.9900,
+      "amount": 89.10,
+      "tariff_type": "daily"
+    },
+    {
+      "description": "Network access",
+      "classification": "network",
+      "amount": 38.67
+    },
+    {
+      "description": "GST",
+      "classification": "tax",
+      "amount": 77.25
+    }
+  ],
+  "totals": {
+    "subtotal": 772.50,
+    "gst": 77.25,
+    "total_due": 849.75,
+    "due_date": "2026-05-10"
+  },
+  "provider": {
+    "retailer_name": "Origin Energy",
+    "abn": "06 106 643 253",
+    "plan_name": "Business Saver Flex"
+  },
+  "validation": {
+    "is_valid": true,
+    "validation_issues": [],
+    "confidence": 0.98
+  }
+}
+```
+
+### Response structure at a glance
+
+| Section | What it contains |
+|---|---|
+| `bill_type` | Energy type classification: `elec`, `gas`, or `lpg` |
+| `account` | Account number, NMI/MIRN, customer name, supply address |
+| `billing_period` | Start date, end date, and number of billing days |
+| `usage` | Total consumption (kWh/MJ), peak/off-peak/shoulder breakdowns, demand, meter readings |
+| `charges` | Every line item with classification, quantity, unit rate, tariff type, and time-of-use period |
+| `totals` | Subtotal, GST, total amount due, due date |
+| `provider` | Retailer name, ABN, plan name |
+| `validation` | Whether the bill passed validation, any issues flagged, confidence score |
+
+See the full [response schema](/api-reference/response-schema) for every field, type, and possible value.
+
+## What to do with the data
+
+Now that you've extracted your first bill, here are common next steps:
+
+<CardGroup cols={2}>
+  <Card title="Process bills across multiple sites" icon="buildings" href="/guides/multi-site-bill-processing">
+    Loop through bills for every location and build a consolidated energy cost view.
+  </Card>
+  <Card title="Feed data into ESG reporting" icon="leaf" href="/guides/esg-emissions-reporting">
+    Use the kWh and MJ usage fields to calculate Scope 2 emissions automatically.
+  </Card>
+  <Card title="Build it into your own app" icon="code" href="/guides/build-an-energy-app">
+    Embed the extract endpoint in your product to give your users energy bill intelligence.
+  </Card>
+  <Card title="Explore the full API reference" icon="book" href="/api-reference/extract-bill">
+    See all request parameters, response fields, error codes, and rate limits.
+  </Card>
+</CardGroup>
+
+## Accessing your data in the dashboard
+
+Every bill you process through the API is also available in your [Termina dashboard](https://app.termina.io). You can:
+
+- **Search and filter** across all processed bills by site, retailer, date, or amount
+- **Export to CSV, XLSX, or PDF** for reporting, reconciliation, or sharing with your team
+- **Track usage trends** and cost anomalies over time across all your sites
+- **Invite team members** with role-based permissions so finance, procurement, and sustainability teams can all access the data
+
+Not a developer? You can also upload bills directly through the dashboard — same OCR extraction engine, just drag, drop, and export.
+
+## Frequently asked questions
+
+<AccordionGroup>
+
+  <Accordion title="What file formats does the API accept?">
+    The endpoint accepts energy bills as PDF, JPEG, PNG, or TIFF files
+    sent as `multipart/form-data` under the `file` field. Both digital
+    PDFs from retailer portals and scanned or photographed paper bills
+    are supported.
+  </Accordion>
+
+  <Accordion title="How long does extraction take?">
+    Most bills are processed in under 3 seconds. Complex multi-page bills
+    or low-quality scans may take slightly longer. The API responds
+    synchronously — no polling or webhooks required.
+  </Accordion>
+
+  <Accordion title="Which energy types can the API extract?">
+    Electricity, gas, and LPG bills. The extraction engine covers network
+    charges, retail charges, environmental levies, market charges, and
+    demand charges — with tariff rate steps and time-of-use breakdowns
+    where present on the bill.
+  </Accordion>
+
+  <Accordion title="Can the API extract time-of-use tariff data?">
+    Yes. Where time-of-use pricing is present on the bill, Termina
+    extracts peak, off-peak, and shoulder rates and consumption
+    separately — including the tariff rate steps and the kWh consumed
+    in each period.
+  </Accordion>
+
+  <Accordion title="What happens if a bill cannot be fully parsed?">
+    The `energy_data` field returns `null` and `validation_issues`
+    describes what went wrong. Partial extractions return the data that
+    was successfully read along with warnings on uncertain fields — so
+    you always know what you can trust.
+  </Accordion>
+
+  <Accordion title="How does bill validation work?">
+    Every extraction runs built-in validation that cross-checks the
+    extracted charges against the bill total, verifies billing period
+    dates are consistent, flags unusually high or low usage, and checks
+    that tariff rates fall within expected ranges for the retailer and
+    region. Issues are returned in the `validation_issues` array.
+  </Accordion>
+
+  <Accordion title="How do I authenticate API requests?">
+    Include your API key in the `X-API-Key` request header. You can
+    generate a free key instantly at
+    [app.termina.io](https://app.termina.io) — no credit card required.
+  </Accordion>
+
+  <Accordion title="What are the rate limits?">
+    Free tier accounts can process up to 50 bills total. Pro accounts
+    have configurable rate limits based on your plan. The API returns
+    a `429` status code with a `Retry-After` header if you exceed your
+    limit. See [Error handling](/api-reference/error-handling) for all
+    status codes.
+  </Accordion>
+
+</AccordionGroup>
