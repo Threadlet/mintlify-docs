@@ -1,15 +1,12 @@
 ---
-title: "Quickstart — Extract Your First Energy Bill in 60 Seconds"
-sidebarTitle: "Quickstart guide"
-description: "Send your first energy bill and get structured JSON back in under a minute. Code examples in Python, Node.js, and cURL for the Termina bill data extraction API."
+description: "Extract structured data from an energy bill in three steps. You'll have clean JSON with usage, charges, tariff rates, and 30+ other fields in under 60 seconds."
+title: "Quickstart"
 ---
 
-# Quickstart
-
-Extract structured data from an energy bill in three steps. You'll have clean JSON with usage, charges, tariff rates, and 30+ other fields in under 60 seconds.
+Extract structured data from an energy bill in three steps. You'll have clean JSON with usage, charges, tariff rates, and 30\+ other fields in under 60 seconds.
 
 <Info>
-  **Free tier** — 50 API credits, no credit card required. Each credit processes one bill page.
+  **Free tier**: 50 API credits, no credit card required. Each credit processes one bill page.
 </Info>
 
 ## 1. Get your API key
@@ -18,7 +15,7 @@ Sign up at [app.termina.io](https://app.termina.io) to generate your free API ke
 
 Your key will look like this:
 
-```
+```text
 tmn_live_a1b2c3d4e5f6...
 ```
 
@@ -72,14 +69,14 @@ curl -X POST https://api.termina.io/v1/extract \
 ### Request details
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `file` | `multipart/form-data` | The energy bill file. Accepted formats: PDF, JPEG, PNG, TIFF. |
 
 The endpoint automatically detects the energy type (electricity, gas, or LPG), the retailer, and the bill layout. No configuration or parameters needed beyond the file itself.
 
-## 3. Get structured JSON back
+## 3. Get structured JSON back 
 
-The API returns structured data with 30+ fields organised into clear sections. Here's an example response from an electricity bill:
+The API returns structured data with 30\+ fields organised into clear sections. Here's an example response from an electricity bill:
 
 ```json Example response
 {
@@ -185,7 +182,7 @@ The API returns structured data with 30+ fields organised into clear sections. H
 ### Response structure at a glance
 
 | Section | What it contains |
-|---|---|
+| --- | --- |
 | `bill_type` | Energy type classification: `elec`, `gas`, or `lpg` |
 | `account` | Account number, NMI/MIRN, customer name, supply address |
 | `billing_period` | Start date, end date, and number of billing days |
@@ -205,12 +202,15 @@ Now that you've extracted your first bill, here are common next steps:
   <Card title="Process bills across multiple sites" icon="buildings" href="/guides/multi-site-bill-processing">
     Loop through bills for every location and build a consolidated energy cost view.
   </Card>
+
   <Card title="Feed data into ESG reporting" icon="leaf" href="/guides/esg-emissions-reporting">
     Use the kWh and MJ usage fields to calculate Scope 2 emissions automatically.
   </Card>
+
   <Card title="Build it into your own app" icon="code" href="/guides/build-an-energy-app">
     Embed the extract endpoint in your product to give your users energy bill intelligence.
   </Card>
+
   <Card title="Explore the full API reference" icon="book" href="/api-reference/extract-bill">
     See all request parameters, response fields, error codes, and rate limits.
   </Card>
@@ -225,66 +225,40 @@ Every bill you process through the API is also available in your [Termina dashbo
 - **Track usage trends** and cost anomalies over time across all your sites
 - **Invite team members** with role-based permissions so finance, procurement, and sustainability teams can all access the data
 
-Not a developer? You can also upload bills directly through the dashboard — same OCR extraction engine, just drag, drop, and export.
+Not a developer? You can also upload bills directly through the dashboard - same OCR extraction engine, just drag, drop, and export.
 
 ## Frequently asked questions
 
 <AccordionGroup>
-
   <Accordion title="What file formats does the API accept?">
-    The endpoint accepts energy bills as PDF, JPEG, PNG, or TIFF files
-    sent as `multipart/form-data` under the `file` field. Both digital
-    PDFs from retailer portals and scanned or photographed paper bills
-    are supported.
+    The endpoint accepts energy bills as PDF, JPEG, PNG, or TIFF files sent as `multipart/form-data` under the `file` field. Both digital PDFs from retailer portals and scanned or photographed paper bills are supported.
   </Accordion>
 
   <Accordion title="How long does extraction take?">
-    Most bills are processed in under 3 seconds. Complex multi-page bills
-    or low-quality scans may take slightly longer. The API responds
-    synchronously — no polling or webhooks required.
+    Most bills are processed in under 3 seconds. Complex multi-page bills or low-quality scans may take slightly longer. The API responds synchronously — no polling or webhooks required.
   </Accordion>
 
   <Accordion title="Which energy types can the API extract?">
-    Electricity, gas, and LPG bills. The extraction engine covers network
-    charges, retail charges, environmental levies, market charges, and
-    demand charges — with tariff rate steps and time-of-use breakdowns
-    where present on the bill.
+    Electricity, gas, and LPG bills. The extraction engine covers network charges, retail charges, environmental levies, market charges, and demand charges — with tariff rate steps and time-of-use breakdowns where present on the bill.
   </Accordion>
 
   <Accordion title="Can the API extract time-of-use tariff data?">
-    Yes. Where time-of-use pricing is present on the bill, Termina
-    extracts peak, off-peak, and shoulder rates and consumption
-    separately — including the tariff rate steps and the kWh consumed
-    in each period.
+    Yes. Where time-of-use pricing is present on the bill, Termina extracts peak, off-peak, and shoulder rates and consumption separately — including the tariff rate steps and the kWh consumed in each period.
   </Accordion>
 
   <Accordion title="What happens if a bill cannot be fully parsed?">
-    The `energy_data` field returns `null` and `validation_issues`
-    describes what went wrong. Partial extractions return the data that
-    was successfully read along with warnings on uncertain fields — so
-    you always know what you can trust.
+    The `energy_data` field returns `null` and `validation_issues` describes what went wrong. Partial extractions return the data that was successfully read along with warnings on uncertain fields — so you always know what you can trust.
   </Accordion>
 
   <Accordion title="How does bill validation work?">
-    Every extraction runs built-in validation that cross-checks the
-    extracted charges against the bill total, verifies billing period
-    dates are consistent, flags unusually high or low usage, and checks
-    that tariff rates fall within expected ranges for the retailer and
-    region. Issues are returned in the `validation_issues` array.
+    Every extraction runs built-in validation that cross-checks the extracted charges against the bill total, verifies billing period dates are consistent, flags unusually high or low usage, and checks that tariff rates fall within expected ranges for the retailer and region. Issues are returned in the `validation_issues` array.
   </Accordion>
 
   <Accordion title="How do I authenticate API requests?">
-    Include your API key in the `X-API-Key` request header. You can
-    generate a free key instantly at
-    [app.termina.io](https://app.termina.io) — no credit card required.
+    Include your API key in the `X-API-Key` request header. You can generate a free key instantly at [app.termina.io](https://app.termina.io) — no credit card required.
   </Accordion>
 
   <Accordion title="What are the rate limits?">
-    Free tier accounts can process up to 50 bills total. Pro accounts
-    have configurable rate limits based on your plan. The API returns
-    a `429` status code with a `Retry-After` header if you exceed your
-    limit. See [Error handling](/api-reference/error-handling) for all
-    status codes.
+    Free tier accounts can process up to 50 bills total. Pro accounts have configurable rate limits based on your plan. The API returns a `429` status code with a `Retry-After` header if you exceed your limit. See [Error handling](/api-reference/error-handling) for all status codes.
   </Accordion>
-
 </AccordionGroup>

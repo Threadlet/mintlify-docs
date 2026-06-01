@@ -1,22 +1,25 @@
 ---
-title: "Termina API — Energy Bill Data Extraction & OCR"
-sidebarTitle: "Introduction"
-description: "Extract structured data from electricity, gas, and LPG bills with AI-powered OCR. 30+ fields returned as JSON including NMI, usage, tariff rates, time-of-use breakdowns, and charges. Free 50-credit tier, no credit card required."
+title: "Introduction"
+description: "Termina API documentation: extract structured data from energy bills using AI-powered OCR. Process electricity, gas, and LPG bills from retailers in Australia, NZ, UK, USA, and Canada. Returns 30+ fields as clean JSON including NMI, usage, tariff rates, charges, and time-of-use breakdowns. Free tier: 50 API credits for unvalidated data, no credit card required."
 ---
+
+
 
 # Energy bill data extraction API
 
-Termina's API extracts structured data from energy bills using AI-powered OCR. Send a PDF of any electricity, gas, or LPG bill and receive clean JSON with 30+ fields — account details, NMI, usage breakdowns, tariff rates, charges, and energy provider information.
+Termina's API extracts structured data from energy bills using AI-powered OCR. Send a PDF of any electricity, gas, or LPG bill and receive clean JSON with 30\+ fields — account details, NMI, usage breakdowns, tariff rates, charges, and energy provider information.
 
-No model training. No infrastructure. One endpoint.
+No model training. No infrastructure. One endpoint.No model training. No infrastructure. One endpoint.No model training. No infrastructure. One endpoint.
 
 <CardGroup cols={3}>
   <Card title="< 3 seconds" icon="bolt">
-    Average processing time per bill
+    Average processing time per bill\
   </Card>
+
   <Card title="99%+ accuracy" icon="bullseye-arrow">
     Field-level OCR accuracy across all supported retailers
   </Card>
+
   <Card title="30+ data fields" icon="table-layout">
     Structured JSON covering every charge, rate, and meter reading
   </Card>
@@ -27,6 +30,7 @@ No model training. No infrastructure. One endpoint.
 <Steps>
   <Step title="Send your bill">
     POST an energy bill PDF to a single endpoint. Any retailer, any format — electricity, gas, LPG, or embedded network invoices.
+
     ```bash
     curl -X POST https://api.termina.io/v1/extract \
       -H "X-API-Key: YOUR_API_KEY" \
@@ -49,18 +53,23 @@ The API returns structured data across five categories from every energy bill:
   <Card title="Account & identity" icon="id-card">
     Account number, NMI/MIRN, customer name, supply address
   </Card>
+
   <Card title="Billing details" icon="calendar">
     Billing period, billing days, invoice number, due date
   </Card>
+
   <Card title="Utility usage & demand" icon="chart-mixed">
     Total kWh/MJ, peak/off-peak/shoulder consumption metrics, demand kW, meter readings
   </Card>
+
   <Card title="Cost calculation & tariff rates" icon="money-bill">
     Supply charges, usage charges, network fees, tariff rate steps, time-of-use breakdowns, GST, total due
   </Card>
+
   <Card title="Energy provider information" icon="building">
     Retailer name, ABN, plan name, contract dates
   </Card>
+
   <Card title="Bill validation" icon="shield-check">
     Automated cross-checks, anomaly flags, and charge total verification
   </Card>
@@ -81,7 +90,7 @@ More countries are on the roadmap. The OCR handles any bill layout from any reta
 ## Supported bill types
 
 | Bill type | Classification codes | Fields extracted |
-|---|---|---|
+| --- | --- | --- |
 | Electricity | Network, retail, environmental, market, demand charges | kWh usage, peak/off-peak/shoulder, demand kW, tariff rate steps, time-of-use breakdowns |
 | Gas | Network, retail, environmental charges | MJ usage, meter reads, daily supply charges |
 | LPG | Supply, delivery charges | Volume, unit rates, delivery fees |
@@ -89,26 +98,26 @@ More countries are on the roadmap. The OCR handles any bill layout from any reta
 
 ## Use cases
 
-<CardGroup cols={2}>
-  <Card title="Multi-site cost management" icon="buildings" href="/guides/multi-site-bill-processing">
-    Consolidate utility bills across all your locations. Automate cost calculation by site, flag rate increases, and spot billing errors.
+<CardGroup cols={3}>
+  <Card title="Multisite cost management" icon="buildings">
+    Consolidate utility bills across all your locations. Automate cost calculation by site, flag rate increases, and spot billing errors.\
   </Card>
-  <Card title="ESG & emissions reporting" icon="leaf" href="/guides/esg-emissions-reporting">
+
+  <Card title="ESG & emissions reporting" icon="leaf">
     Feed extracted utility usage data and consumption metrics directly into Scope 2 calculations. Automate NGER, NABERS, and sustainability reporting.
   </Card>
-  <Card title="Build your own energy app" icon="code" href="/guides/build-an-energy-app">
-    Embed bill extraction into energy comparison tools, solar calculators, property platforms, or any custom application.
-  </Card>
-  <Card title="Energy broker platforms" icon="arrow-right-arrow-left">
-    Ingest client bills at scale, benchmark rates against market, and identify switching opportunities — without manual data entry.
+
+  <Card title="Build your own energy app" icon="code">
+    Embed bill extraction into energy comparison tools, solar calculators, property platforms, or any custom application.\
+    \
   </Card>
 </CardGroup>
 
 ## Your energy data, structured in one place
 
-Termina is more than an OCR tool. Every bill you process is stored in your Termina dashboard — searchable, filterable, and exportable as CSV, XLSX, or PDF.
+Termina is more than an OCR tool. Every bill you process is stored in your Termina dashboard -  searchable, filterable, and exportable as CSV, XLSX, or PDF.
 
-Unlike general-purpose tools like AWS Textract or Google Document AI that return raw text you still need to parse and store, Termina structures all of your energy data — including time-of-use tariffs, consumption metrics, and cost breakdowns — into a single source of truth that finance, procurement, and sustainability teams can all work from.
+Unlike general-purpose tools like AWS Textract or Google Document AI that return raw text you still need to parse and store, Termina validates and structures all of your energy data — including time-of-use tariffs, consumption metrics, and cost breakdowns — into a single source of truth that finance, procurement, and sustainability teams can all work from.
 
 ## Get started
 
@@ -116,6 +125,7 @@ Unlike general-purpose tools like AWS Textract or Google Document AI that return
   <Card title="Quickstart" icon="rocket" href="/quickstart">
     Extract your first energy bill in 60 seconds
   </Card>
+
   <Card title="API reference" icon="code" href="/api-reference/extract-bill">
     Full endpoint documentation with request and response schemas
   </Card>
@@ -124,75 +134,39 @@ Unlike general-purpose tools like AWS Textract or Google Document AI that return
 ## Frequently asked questions
 
 <AccordionGroup>
-
   <Accordion title="What is the Termina energy bill data extraction API?">
-    Termina is an AI-powered OCR API that extracts structured data from
-    energy bills. Send an electricity, gas, or LPG bill as a PDF and
-    receive clean JSON with 30+ fields — including account details, NMI,
-    usage, tariff rates, time-of-use breakdowns, charges, and energy
-    provider information. No model training or infrastructure required.
+    Termina is an AI-powered OCR API that extracts structured data from energy bills. Send an electricity, gas, or LPG bill as a PDF and receive clean JSON with 30\+ fields — including account details, NMI, usage, tariff rates, time-of-use breakdowns, charges, and energy provider information. No model training or infrastructure required.
   </Accordion>
 
   <Accordion title="Is there a free energy bill OCR API?">
-    Yes. Termina offers 50 free API credits with no credit card required.
-    Each credit processes one bill. Sign up, get your API key, and start
-    extracting structured data from energy bills in under a minute.
-    See [Quickstart](/quickstart) to get started.
+    Yes. Termina offers 50 free API credits with no credit card required. Each credit processes one bill. Sign up, get your API key, and start extracting structured data from energy bills in under a minute. See [Quickstart](/quickstart) to get started.
   </Accordion>
 
   <Accordion title="Which countries and energy retailers are supported?">
-    Termina supports energy bills from retailers across Australia, New
-    Zealand, the UK, the USA, and Canada. The OCR handles any bill layout
-    from any retailer in these markets — no configuration needed. More
-    countries are on the roadmap.
+    Termina supports energy bills from retailers across Australia, New Zealand, the UK, the USA, and Canada. The OCR handles any bill layout from any retailer in these markets — no configuration needed. More countries are on the roadmap.
   </Accordion>
 
   <Accordion title="How accurate is the energy bill OCR?">
-    Termina achieves over 99% field-level accuracy across all supported
-    retailers. The API includes built-in bill validation that cross-checks
-    extracted values, flags anomalies, and verifies that charge totals
-    match line items.
+    Termina achieves over 99% field-level accuracy across all supported retailers. The API includes built-in bill validation that cross-checks extracted values, flags anomalies, and verifies that charge totals match line items.
   </Accordion>
 
   <Accordion title="How is Termina different from AWS Textract for energy bills?">
-    Textract is a general-purpose document AI that returns raw OCR text —
-    you still need to build parsing, validation, and storage. Termina is
-    purpose-built for energy bills: one POST, structured JSON back with
-    energy-specific fields like NMI, tariff rates, and time-of-use
-    breakdowns. No S3 buckets, no IAM roles, no post-processing. Termina
-    also serves as a system of record for your energy data, not just an
-    extraction tool.
+    Textract is a general-purpose document AI that returns raw OCR text — you still need to build parsing, validation, and storage. Termina is purpose-built for energy bills: one POST, structured JSON back with energy-specific fields like NMI, tariff rates, and time-of-use breakdowns. No S3 buckets, no IAM roles, no post-processing. Termina also serves as a system of record for your energy data, not just an extraction tool.
   </Accordion>
 
   <Accordion title="How is Termina different from Google Document AI?">
-    Google Document AI offers a general invoice processor with no
-    dedicated energy bill schema. Termina extracts energy-specific fields
-    (NMI, MIRN, tariff structures, time-of-use splits, retailer details)
-    out of the box — no GCP setup, no model training, no custom
-    post-processing. Your energy data is structured in one place so
-    finance, procurement, and sustainability teams can all use it.
+    Google Document AI offers a general invoice processor with no dedicated energy bill schema. Termina extracts energy-specific fields (NMI, MIRN, tariff structures, time-of-use splits, retailer details) out of the box — no GCP setup, no model training, no custom post-processing. Your energy data is structured in one place so finance, procurement, and sustainability teams can all use it.
   </Accordion>
 
   <Accordion title="Do I need to train an OCR model for my energy bills?">
-    No. Termina comes with a pre-built extraction schema that works with
-    every supported retailer out of the box. Unlike general-purpose OCR
-    platforms, there is no training step, no sample uploads, and no
-    configuration. Send a bill, get structured data back.
+    No. Termina comes with a pre-built extraction schema that works with every supported retailer out of the box. Unlike general-purpose OCR platforms, there is no training step, no sample uploads, and no configuration. Send a bill, get structured data back.
   </Accordion>
 
   <Accordion title="Can I use this API to build my own energy app?">
-    Yes — that is exactly what it is designed for. Embed Termina's bill
-    extraction into energy comparison tools, solar calculators, property
-    management platforms, ESG dashboards, or any custom application. The
-    free tier gives you 50 credits to prototype with. See
-    [Build an energy app](/guides/build-an-energy-app).
+    Yes — that is exactly what it is designed for. Embed Termina's bill extraction into energy comparison tools, solar calculators, property management platforms, ESG dashboards, or any custom application. The free tier gives you 50 credits to prototype with. See [Build an energy app](/guides/build-an-energy-app).
   </Accordion>
 
   <Accordion title="Does Termina store my bill data?">
-    Every bill you process is available in your Termina dashboard —
-    searchable, filterable, and exportable as CSV, XLSX, or PDF. Termina
-    acts as a system of record for your energy data so you can leverage
-    it across cost management, contract negotiation, and ESG reporting.
+    Every bill you process is available in your Termina dashboard — searchable, filterable, and exportable as CSV, XLSX, or PDF. Termina acts as a system of record for your energy data so you can leverage it across cost management, contract negotiation, and ESG reporting.
   </Accordion>
-
 </AccordionGroup>
