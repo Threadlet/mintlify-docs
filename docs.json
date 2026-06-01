@@ -27,7 +27,6 @@
         "tab": "API Reference",
         "openapi": "openapi.yaml",
         "pages": [
-          "api-reference/introduction",
           "POST /api/v2/public/bills/upload/"
         ]
       }
