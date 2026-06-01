@@ -16,10 +16,12 @@
     "tabs": [
       {
         "tab": "Documentation",
-        "groups": [
+        "pages": [
+          "index",
+          "quickstart",
           {
             "group": "Getting Started",
-            "pages": ["index", "quickstart"]
+            "pages": []
           }
         ]
       },
@@ -31,5 +33,8 @@
         ]
       }
     ]
+  },
+  "api": {
+    "openapi": "openapi.yaml"
   }
 }
