@@ -1,0 +1,923 @@
+openapi: 3.0.3
+info:
+  title: Termina Public API
+  version: 1.0.0
+  description: Public API for programmatic access to Termina services.
+paths:
+  /api/v2/public/bills/upload/:
+    post:
+      operationId: public_bills_upload_create
+      description: Upload an energy bill PDF for automated extraction and storage.
+      tags:
+      - public
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      security:
+      - apiKey: []
+      responses:
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicBillsUploadCreateErrorResponse400'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse401'
+              examples:
+                AuthenticationFailed:
+                  value:
+                    type: client_error
+                    errors:
+                    - code: authentication_failed
+                      detail: Incorrect authentication credentials.
+                      attr: null
+                NotAuthenticated:
+                  value:
+                    type: client_error
+                    errors:
+                    - code: not_authenticated
+                      detail: Authentication credentials were not provided.
+                      attr: null
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse403'
+              examples:
+                PermissionDenied:
+                  value:
+                    type: client_error
+                    errors:
+                    - code: permission_denied
+                      detail: You do not have permission to perform this action.
+                      attr: null
+          description: ''
+        '405':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse405'
+              examples:
+                MethodNotAllowed:
+                  value:
+                    type: client_error
+                    errors:
+                    - code: method_not_allowed
+                      detail: Method "get" not allowed.
+                      attr: null
+          description: ''
+        '406':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse406'
+              examples:
+                NotAcceptable:
+                  value:
+                    type: client_error
+                    errors:
+                    - code: not_acceptable
+                      detail: Could not satisfy the request Accept header.
+                      attr: null
+          description: ''
+        '415':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse415'
+              examples:
+                UnsupportedMediaType:
+                  value:
+                    type: client_error
+                    errors:
+                    - code: unsupported_media_type
+                      detail: Unsupported media type "application/json" in request.
+                      attr: null
+          description: ''
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse429'
+              examples:
+                Throttled:
+                  value:
+                    type: client_error
+                    errors:
+                    - code: throttled
+                      detail: Request was throttled.
+                      attr: null
+          description: ''
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse500'
+              examples:
+                APIException:
+                  value:
+                    type: server_error
+                    errors:
+                    - code: error
+                      detail: A server error occurred.
+                      attr: null
+          description: ''
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillUploadResponse'
+          description: ''
+components:
+  schemas:
+    BillQuantityUnit:
+      enum:
+      - kWh
+      - MJ
+      - m3
+      - kW
+      - kW day
+      - kVA
+      - kVA day
+      - days
+      - months
+      - kg
+      - bottle
+      - litre
+      title: BillQuantityUnit
+      type: string
+    BillRateUnit:
+      enum:
+      - cent/kWh
+      - $/kWh
+      - cent/MJ
+      - $/MJ
+      - cent/day
+      - $/day
+      - $/month
+      - $/bill
+      - $/year
+      - $/kW
+      - $/kW/day
+      - $/kW/month
+      - $/kVA
+      - $/kVA/day
+      - $/kVA/month
+      - $/m3
+      - cent/m3
+      - $/kg
+      - $/bottle
+      - $/litre
+      title: BillRateUnit
+      type: string
+    BillUploadResponse:
+      properties:
+        bill_uuid:
+          title: Bill Uuid
+          type: string
+        energy_data:
+          anyOf:
+          - $ref: '#/components/schemas/EnergyBill'
+          - type: 'null'
+        validation_issues:
+          items:
+            $ref: '#/components/schemas/ValidationIssue'
+          title: Validation Issues
+          type: array
+      required:
+      - bill_uuid
+      - energy_data
+      - validation_issues
+      title: BillUploadResponse
+      type: object
+    BillingTimePeriod:
+      properties:
+        start_date:
+          title: Start Date
+          type: string
+        end_date:
+          title: End Date
+          type: string
+        days:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          default: null
+          title: Days
+      required:
+      - start_date
+      - end_date
+      title: BillingTimePeriod
+      type: object
+    ChargeLineItem:
+      properties:
+        retailer_note:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          description: Supplementary retailer text for this charge, or null
+          title: Retailer Note
+        classification:
+          $ref: '#/components/schemas/PriceClassification'
+          description: Standardised charge classification
+        tariff_name:
+          description: Charge name as shown on the bill
+          title: Tariff Name
+          type: string
+        rate_steps:
+          items:
+            $ref: '#/components/schemas/RateStep'
+          title: Rate Steps
+          type: array
+        amount:
+          title: Amount
+          type: number
+        period_start:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Period Start
+        period_end:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Period End
+        is_all_other_times:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          default: false
+          description: True if this is a catch-all time band covering all remaining
+            times
+          title: Is All Other Times
+        tou_timing:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/TimingBlock'
+            type: array
+          - type: 'null'
+          default: null
+          description: Time-of-use timing windows for this charge, or null
+          title: Tou Timing
+      required:
+      - classification
+      - tariff_name
+      - rate_steps
+      - amount
+      title: ChargeLineItem
+      type: object
+    ClientErrorEnum:
+      enum:
+      - client_error
+      type: string
+    EnergyBill:
+      properties:
+        schema_version:
+          default: '1.0'
+          description: Schema version
+          title: Schema Version
+          type: string
+        retailer_name:
+          description: Energy retailer name
+          title: Retailer Name
+          type: string
+        account_number:
+          title: Account Number
+          type: string
+        account_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Account Name
+        fuel_type:
+          $ref: '#/components/schemas/EnergyTypeEnum'
+          description: 'Fuel type: ''elec'' (electricity) or ''gas'''
+        site_identifier:
+          title: Site Identifier
+          type: string
+        supply_address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Supply Address
+        billing_period:
+          $ref: '#/components/schemas/BillingTimePeriod'
+        invoice_number:
+          title: Invoice Number
+          type: string
+        issue_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Issue Date
+        due_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Due Date
+        read_type:
+          anyOf:
+          - $ref: '#/components/schemas/ReadType'
+          - type: 'null'
+          default: null
+        rates_include_gst:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          default: null
+          title: Rates Include Gst
+        charges:
+          description: List of energy-related charges and credits
+          items:
+            $ref: '#/components/schemas/ChargeLineItem'
+          title: Charges
+          type: array
+        total_amount:
+          description: Net total of all charges and credits including GST
+          title: Total Amount
+          type: number
+        total_due:
+          anyOf:
+          - type: number
+          - type: 'null'
+          default: null
+          description: Total account balance due including prior balance, or null
+            if no prior balance
+          title: Total Due
+        bpay_biller_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Bpay Biller Code
+        bpay_customer_reference:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Bpay Customer Reference
+        is_final_bill:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          default: null
+          description: Whether this is a final/closing bill
+          title: Is Final Bill
+        tariff_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Tariff Code
+        meter_number:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Meter Number
+        meter_reads:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/MeterRead'
+            type: array
+          - type: 'null'
+          default: null
+          title: Meter Reads
+      required:
+      - retailer_name
+      - account_number
+      - fuel_type
+      - site_identifier
+      - billing_period
+      - invoice_number
+      - charges
+      - total_amount
+      title: EnergyBill
+      type: object
+    EnergyTypeEnum:
+      enum:
+      - elec
+      - gas
+      - lpg
+      title: EnergyTypeEnum
+      type: string
+    Error401:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode401Enum'
+        detail:
+          type: string
+        attr:
+          type: string
+          nullable: true
+      required:
+      - attr
+      - code
+      - detail
+    Error403:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode403Enum'
+        detail:
+          type: string
+        attr:
+          type: string
+          nullable: true
+      required:
+      - attr
+      - code
+      - detail
+    Error405:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode405Enum'
+        detail:
+          type: string
+        attr:
+          type: string
+          nullable: true
+      required:
+      - attr
+      - code
+      - detail
+    Error406:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode406Enum'
+        detail:
+          type: string
+        attr:
+          type: string
+          nullable: true
+      required:
+      - attr
+      - code
+      - detail
+    Error415:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode415Enum'
+        detail:
+          type: string
+        attr:
+          type: string
+          nullable: true
+      required:
+      - attr
+      - code
+      - detail
+    Error429:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode429Enum'
+        detail:
+          type: string
+        attr:
+          type: string
+          nullable: true
+      required:
+      - attr
+      - code
+      - detail
+    Error500:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode500Enum'
+        detail:
+          type: string
+        attr:
+          type: string
+          nullable: true
+      required:
+      - attr
+      - code
+      - detail
+    ErrorCode401Enum:
+      enum:
+      - authentication_failed
+      - not_authenticated
+      type: string
+    ErrorCode403Enum:
+      enum:
+      - permission_denied
+      type: string
+    ErrorCode405Enum:
+      enum:
+      - method_not_allowed
+      type: string
+    ErrorCode406Enum:
+      enum:
+      - not_acceptable
+      type: string
+    ErrorCode415Enum:
+      enum:
+      - unsupported_media_type
+      type: string
+    ErrorCode429Enum:
+      enum:
+      - throttled
+      type: string
+    ErrorCode500Enum:
+      enum:
+      - error
+      type: string
+    ErrorResponse401:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ClientErrorEnum'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error401'
+      required:
+      - errors
+      - type
+    ErrorResponse403:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ClientErrorEnum'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error403'
+      required:
+      - errors
+      - type
+    ErrorResponse405:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ClientErrorEnum'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error405'
+      required:
+      - errors
+      - type
+    ErrorResponse406:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ClientErrorEnum'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error406'
+      required:
+      - errors
+      - type
+    ErrorResponse415:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ClientErrorEnum'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error415'
+      required:
+      - errors
+      - type
+    ErrorResponse429:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ClientErrorEnum'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error429'
+      required:
+      - errors
+      - type
+    ErrorResponse500:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ServerErrorEnum'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error500'
+      required:
+      - errors
+      - type
+    MeterRead:
+      properties:
+        meter_number:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Meter Number
+        register_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Register Name
+        previous_read:
+          anyOf:
+          - type: number
+          - type: 'null'
+          default: null
+          title: Previous Read
+        current_read:
+          anyOf:
+          - type: number
+          - type: 'null'
+          default: null
+          title: Current Read
+        read_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Read Date
+        previous_read_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Previous Read Date
+        multiplier:
+          anyOf:
+          - type: number
+          - type: 'null'
+          default: null
+          title: Multiplier
+        consumption:
+          anyOf:
+          - type: number
+          - type: 'null'
+          default: null
+          title: Consumption
+        consumption_unit:
+          anyOf:
+          - $ref: '#/components/schemas/BillQuantityUnit'
+          - type: 'null'
+          default: null
+        read_type:
+          anyOf:
+          - $ref: '#/components/schemas/ReadType'
+          - type: 'null'
+          default: null
+      title: MeterRead
+      type: object
+    ParseError:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ParseErrorCodeEnum'
+        detail:
+          type: string
+        attr:
+          type: string
+          nullable: true
+      required:
+      - attr
+      - code
+      - detail
+    ParseErrorCodeEnum:
+      enum:
+      - parse_error
+      type: string
+    ParseErrorResponse:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ClientErrorEnum'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParseError'
+      required:
+      - errors
+      - type
+    PriceClassification:
+      enum:
+      - Network Peak
+      - Network Off Peak
+      - Network Shoulder
+      - Network Supply
+      - Network Anytime
+      - Network Controlled Load
+      - Network Metering Charge
+      - Network Low Demand
+      - Network High Demand
+      - Network Anytime Demand
+      - Network Capacity Charge
+      - Network Congestion Charge
+      - Network Solar FIT
+      - Network General TOU
+      - Transmission General TOU
+      - Greenpower
+      - Retail Peak
+      - Retail Off Peak
+      - Retail Shoulder
+      - Retail Anytime
+      - General TOU
+      - High Demand
+      - Low Demand
+      - Anytime Demand
+      - Congestion Charge
+      - Metering
+      - Supply
+      - Controlled Load Supply
+      - Controlled Load
+      - Solar FIT
+      - Market Charge Other
+      - VEET
+      - LRET
+      - SRES
+      - AEMO Ancillary
+      - AEMO Pool Fees
+      - SREC
+      - Participant Charge
+      - ESC
+      - NSW ESS
+      - Operator Consumption
+      - General Environmental Charge
+      - Demand Price
+      - Capacity Charge
+      - Additional Billing
+      - Connection
+      - Disconnection
+      - AEMO FRC
+      - AEMO UFE
+      - Network Management
+      - AEMO Directional
+      - Credit
+      - Late Fees
+      - Line Loss Charge
+      - Demand Reduction
+      - Billing Fee
+      - EA Levy
+      - GIC Levy
+      - LPG Rental
+      - LPG Usage
+      - LPG Swapped
+      - Power Factor Charge
+      - Load Shift
+      - Network Load Shift
+      title: PriceClassification
+      type: string
+    PublicBillsUploadCreateErrorResponse400:
+      oneOf:
+      - $ref: '#/components/schemas/ParseErrorResponse'
+      discriminator:
+        propertyName: type
+        mapping:
+          client_error: '#/components/schemas/ParseErrorResponse'
+    RateStep:
+      properties:
+        lower_bound:
+          anyOf:
+          - type: number
+          - type: 'null'
+          default: null
+          title: Lower Bound
+        rate:
+          title: Rate
+          type: number
+        rate_unit:
+          $ref: '#/components/schemas/BillRateUnit'
+          description: Unit of the rate (e.g. 'cent/kWh', '$/day')
+        quantity:
+          anyOf:
+          - type: number
+          - type: 'null'
+          default: null
+          title: Quantity
+        quantity_unit:
+          anyOf:
+          - $ref: '#/components/schemas/BillQuantityUnit'
+          - type: 'null'
+          default: null
+        amount:
+          anyOf:
+          - type: number
+          - type: 'null'
+          default: null
+          title: Amount
+      required:
+      - rate
+      - rate_unit
+      title: RateStep
+      type: object
+    ReadType:
+      enum:
+      - actual
+      - estimated
+      - substituted
+      title: ReadType
+      type: string
+    ServerErrorEnum:
+      enum:
+      - server_error
+      type: string
+    SeverityEnum:
+      enum:
+      - WARNING
+      - ERROR
+      - ERROR_IGNORABLE
+      type: string
+    TimePeriod:
+      properties:
+        start_time:
+          maximum: 23
+          minimum: 0
+          title: Start Time
+          type: integer
+        end_time:
+          maximum: 23
+          minimum: 0
+          title: End Time
+          type: integer
+      required:
+      - start_time
+      - end_time
+      title: TimePeriod
+      type: object
+    TimingBlock:
+      additionalProperties: true
+      properties:
+        months:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          default: null
+          title: Months
+        days_of_week:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          default: null
+          title: Days Of Week
+        time_periods:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/TimePeriod'
+            type: array
+          - type: 'null'
+          default: null
+          title: Time Periods
+      title: TimingBlock
+      type: object
+    ValidationIssue:
+      properties:
+        severity:
+          allOf:
+          - $ref: '#/components/schemas/SeverityEnum'
+          title: Severity
+        field:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Field
+        message:
+          title: Message
+          type: string
+      required:
+      - severity
+      - field
+      - message
+      title: ValidationIssue
+      type: object
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
