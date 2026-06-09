@@ -1,6 +1,6 @@
 ---
-description: "Extract structured data from an energy bill in three steps. You'll have clean JSON with usage, charges, tariff rates, and 30+ other fields in under 60 seconds."
 title: "Quickstart"
+description: "Extract structured data from an energy bill in three steps. You'll have clean JSON with usage, charges, tariff rates, and 30+ other fields in under 60 seconds."
 ---
 
 Extract structured data from an energy bill in three steps. You'll have clean JSON with usage, charges, tariff rates, and 30\+ other fields in under 60 seconds.
@@ -74,7 +74,7 @@ curl -X POST https://api.termina.io/v1/extract \
 
 The endpoint automatically detects the energy type (electricity, gas, or LPG), the retailer, and the bill layout. No configuration or parameters needed beyond the file itself.
 
-## 3. Get structured JSON back 
+## 3. Get structured JSON back
 
 The API returns structured data with 30\+ fields organised into clear sections. Here's an example response from an electricity bill:
 
@@ -191,8 +191,6 @@ The API returns structured data with 30\+ fields organised into clear sections. 
 | `totals` | Subtotal, GST, total amount due, due date |
 | `provider` | Retailer name, ABN, plan name |
 | `validation` | Whether the bill passed validation, any issues flagged, confidence score |
-
-See the full [response schema](/api-reference/response-schema) for every field, type, and possible value.
 
 ## What to do with the data
 
