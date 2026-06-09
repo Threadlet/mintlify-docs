@@ -36,5 +36,8 @@
   },
   "api": {
     "openapi": "/openapi.yaml"
+  },
+  "markdown": {
+    "schema": true
   }
 }
