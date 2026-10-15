@@ -16,24 +16,38 @@
     "tabs": [
       {
         "tab": "Documentation",
-        "pages": [
-          "index",
-          "quickstart",
+        "groups": [
           {
             "group": "Getting Started",
-            "pages": []
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "openapi": "openapi.yaml",
-        "pages": [
-          "api-reference/bills/upload",
-          {
-            "group": "rates",
             "pages": [
-              "api-reference/rates/get-rates"
+              "index",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Bill extraction API reference",
+            "pages": [
+              "api-reference/bills/upload"
+            ]
+          },
+          {
+            "group": "Business electricity rates",
+            "pages": [
+              "rates/overview",
+              "rates/quickstart",
+              "rates/ai-agents",
+              "rates/locations",
+              "rates/methodology",
+              "rates/buying-group-and-public-plans",
+              "rates/errors-and-warnings",
+              "rates/networks-and-cities"
+            ]
+          },
+          {
+            "group": "Rates API reference",
+            "openapi": "/openapi-rates.yaml",
+            "pages": [
+              "documentation/rates-api-reference/get-rates"
             ]
           }
         ]
