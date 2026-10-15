@@ -1,0 +1,146 @@
+---
+title: "Supported networks, cities and states"
+description: "The complete list of locations the business electricity rates API supports: all 13 National Electricity Market networks, 86 cities, 6 states and territories, and 2,221 postcodes."
+---
+
+The rates API covers every distribution network on Australia's National Electricity Market. This page lists **every** network and city slug it accepts.
+
+| Location | Coverage | Parameter |
+| --- | --- | --- |
+| Networks | All 13 on the National Electricity Market | `distributor` |
+| Cities | 86 cities (all capitals except Perth and Darwin, plus regional cities) | `city` |
+| States and territories | NSW, VIC, QLD, SA, TAS, ACT | `state` |
+| Postcodes | 2,221 postcodes | `postcode` |
+| Sites | Any NMI on the National Electricity Market | `nmi` |
+
+<Info>
+  **Town or suburb not listed?** It's still covered. Use its postcode, or the site's NMI, and the API finds the network that serves it.
+</Info>
+
+WA and NT aren't on the National Electricity Market, so locations there return `422 out_of_coverage`.
+
+## Networks
+
+All 13 networks. Network slugs also match the pages at `termina.com/cheapest-business-electricity/{slug}`.
+
+| `distributor` | Network | State | Benchmark |
+| --- | --- | --- | --- |
+| `ausgrid` | Ausgrid | NSW | DMO |
+| `endeavour-energy` | Endeavour Energy | NSW | DMO |
+| `essential-energy` | Essential Energy | NSW | DMO |
+| `evoenergy` | Evoenergy | ACT | None |
+| `ausnet-services` | AusNet Services | VIC | VDO |
+| `citipower` | CitiPower | VIC | VDO |
+| `jemena` | Jemena | VIC | VDO |
+| `powercor` | Powercor | VIC | VDO |
+| `united-energy` | United Energy | VIC | VDO |
+| `energex` | Energex | QLD | DMO |
+| `ergon-energy` | Ergon Energy | QLD | None |
+| `sa-power-networks` | SA Power Networks | SA | DMO |
+| `tasnetworks` | TasNetworks | TAS | Aurora regulated tariff |
+
+## States and territories
+
+| `state` | Networks |
+| --- | --- |
+| `NSW` | Ausgrid, Endeavour Energy, Essential Energy |
+| `VIC` | CitiPower, Powercor, Jemena, United Energy, AusNet Services |
+| `QLD` | Energex, Ergon Energy |
+| `SA` | SA Power Networks |
+| `TAS` | TasNetworks |
+| `ACT` | Evoenergy |
+
+## Cities
+
+All 86 supported cities. Capital cities use ABS Greater Capital City areas; regional cities use ABS Significant Urban Areas. "Networks" lists the networks costed for each city.
+
+| `city` | City | State | Networks |
+| --- | --- | --- | --- |
+| `canberra` | Canberra | ACT | Evoenergy |
+| `armidale` | Armidale | NSW | Essential Energy |
+| `ballina` | Ballina | NSW | Essential Energy |
+| `batemans-bay` | Batemans Bay | NSW | Endeavour Energy, Essential Energy |
+| `bathurst` | Bathurst | NSW | Endeavour Energy, Essential Energy |
+| `bowral-mittagong` (or `bowral`, `mittagong`) | Bowral - Mittagong | NSW | Endeavour Energy |
+| `broken-hill` | Broken Hill | NSW | Essential Energy |
+| `byron-bay` | Byron Bay | NSW | Essential Energy |
+| `camden-haven` | Camden Haven | NSW | Essential Energy |
+| `central-coast` | Central Coast | NSW | Ausgrid, Endeavour Energy |
+| `coffs-harbour` | Coffs Harbour | NSW | Essential Energy |
+| `dubbo` | Dubbo | NSW | Essential Energy |
+| `forster-tuncurry` (or `forster`, `tuncurry`) | Forster - Tuncurry | NSW | Essential Energy |
+| `goulburn` | Goulburn | NSW | Endeavour Energy, Essential Energy |
+| `grafton` | Grafton | NSW | Essential Energy |
+| `griffith` | Griffith | NSW | Essential Energy |
+| `lismore` | Lismore | NSW | Essential Energy |
+| `lithgow` | Lithgow | NSW | Endeavour Energy, Essential Energy |
+| `medowie` | Medowie | NSW | Ausgrid |
+| `morisset-cooranbong` (or `cooranbong`, `morisset`) | Morisset - Cooranbong | NSW | Ausgrid |
+| `muswellbrook` | Muswellbrook | NSW | Ausgrid |
+| `nelson-bay` | Nelson Bay | NSW | Ausgrid |
+| `newcastle-maitland` (or `maitland`, `newcastle`) | Newcastle - Maitland | NSW | Ausgrid, Endeavour Energy |
+| `nowra-bomaderry` (or `bomaderry`, `nowra`) | Nowra - Bomaderry | NSW | Endeavour Energy |
+| `orange` | Orange | NSW | Endeavour Energy, Essential Energy |
+| `port-macquarie` | Port Macquarie | NSW | Essential Energy |
+| `singleton` | Singleton | NSW | Ausgrid, Endeavour Energy |
+| `sydney` | Sydney | NSW | Ausgrid, Endeavour Energy |
+| `tamworth` | Tamworth | NSW | Essential Energy |
+| `taree` | Taree | NSW | Essential Energy |
+| `ulladulla` | Ulladulla | NSW | Endeavour Energy, Essential Energy |
+| `wagga-wagga` | Wagga Wagga | NSW | Essential Energy |
+| `wollongong` | Wollongong | NSW | Endeavour Energy |
+| `airlie-beach-cannonvale` (or `airlie-beach`, `cannonvale`) | Airlie Beach - Cannonvale | QLD | Ergon Energy |
+| `brisbane` | Brisbane | QLD | Energex |
+| `bundaberg` | Bundaberg | QLD | Ergon Energy |
+| `cairns` | Cairns | QLD | Ergon Energy |
+| `emerald` | Emerald | QLD | Ergon Energy |
+| `gladstone` | Gladstone | QLD | Ergon Energy |
+| `gold-coast-tweed-heads` (or `gold-coast`, `tweed-heads`) | Gold Coast - Tweed Heads | QLD | Energex, Essential Energy |
+| `hervey-bay` | Hervey Bay | QLD | Ergon Energy |
+| `kingaroy` | Kingaroy | QLD | Ergon Energy |
+| `mackay` | Mackay | QLD | Ergon Energy |
+| `maryborough` | Maryborough | QLD | Ergon Energy |
+| `mount-isa` | Mount Isa | QLD | Ergon Energy |
+| `rockhampton` | Rockhampton | QLD | Ergon Energy |
+| `sunshine-coast` | Sunshine Coast | QLD | Energex |
+| `toowoomba` | Toowoomba | QLD | Ergon Energy, Energex, Essential Energy |
+| `townsville` | Townsville | QLD | Ergon Energy |
+| `warwick` | Warwick | QLD | Ergon Energy |
+| `yeppoon` | Yeppoon | QLD | Ergon Energy |
+| `adelaide` | Adelaide | SA | SA Power Networks |
+| `mount-gambier` | Mount Gambier | SA | SA Power Networks |
+| `murray-bridge` | Murray Bridge | SA | SA Power Networks |
+| `port-augusta` | Port Augusta | SA | SA Power Networks |
+| `port-lincoln` | Port Lincoln | SA | SA Power Networks |
+| `port-pirie` | Port Pirie | SA | SA Power Networks |
+| `victor-harbor-goolwa` (or `goolwa`, `victor-harbor`) | Victor Harbor - Goolwa | SA | SA Power Networks |
+| `whyalla` | Whyalla | SA | SA Power Networks |
+| `burnie-somerset` (or `burnie`, `somerset`) | Burnie - Somerset | TAS | TasNetworks |
+| `devonport` | Devonport | TAS | TasNetworks |
+| `hobart` | Hobart | TAS | TasNetworks |
+| `launceston` | Launceston | TAS | TasNetworks |
+| `ulverstone` | Ulverstone | TAS | TasNetworks |
+| `albury-wodonga` (or `albury`, `wodonga`) | Albury - Wodonga | VIC | Essential Energy, AusNet Services |
+| `bacchus-marsh` | Bacchus Marsh | VIC | Jemena, Powercor |
+| `bairnsdale` | Bairnsdale | VIC | AusNet Services |
+| `ballarat` | Ballarat | VIC | Powercor |
+| `bendigo` | Bendigo | VIC | Powercor |
+| `castlemaine` | Castlemaine | VIC | Powercor |
+| `colac` | Colac | VIC | Powercor |
+| `echuca-moama` (or `echuca`, `moama`) | Echuca - Moama | VIC | Essential Energy, Powercor |
+| `geelong` | Geelong | VIC | Powercor |
+| `gisborne` | Gisborne | VIC | Powercor, Jemena |
+| `horsham` | Horsham | VIC | Powercor |
+| `melbourne` | Melbourne | VIC | AusNet Services, United Energy, Jemena, CitiPower, Powercor |
+| `mildura-buronga` (or `buronga`, `mildura`) | Mildura - Buronga | VIC | Essential Energy, Powercor |
+| `moe-newborough` (or `moe`, `newborough`) | Moe - Newborough | VIC | AusNet Services |
+| `portland` | Portland | VIC | Powercor |
+| `sale` | Sale | VIC | AusNet Services |
+| `shepparton-mooroopna` (or `mooroopna`, `shepparton`) | Shepparton - Mooroopna | VIC | Powercor, AusNet Services |
+| `swan-hill` | Swan Hill | VIC | Powercor |
+| `traralgon-morwell` (or `morwell`, `traralgon`) | Traralgon - Morwell | VIC | AusNet Services |
+| `wangaratta` | Wangaratta | VIC | AusNet Services |
+| `warragul-drouin` (or `drouin`, `warragul`) | Warragul - Drouin | VIC | AusNet Services |
+| `warrnambool` | Warrnambool | VIC | Powercor |
+
+These cities are in WA or the NT, outside the National Electricity Market, and return `422 out_of_coverage`: Albany, Alice Springs, Broome, Bunbury, Busselton, Darwin, Geraldton, Kalgoorlie - Boulder, Karratha, Perth, Port Hedland.

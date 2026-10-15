@@ -1,0 +1,25 @@
+{
+  "_comment": "Merge into docs.json. Adds a 'Business electricity rates' group and the rates API reference. Keep your existing groups; adjust to your navigation structure (tabs or groups).",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Business electricity rates",
+        "pages": [
+          "rates/overview",
+          "rates/quickstart",
+          "rates/ai-agents",
+          "rates/locations",
+          "rates/methodology",
+          "rates/buying-group-and-public-plans",
+          "rates/errors-and-warnings",
+          "rates/networks-and-cities"
+        ]
+      },
+      {
+        "group": "Rates API reference",
+        "openapi": "/openapi-rates.yaml",
+        "pages": ["api-reference/rates/get-rates"]
+      }
+    ]
+  }
+}

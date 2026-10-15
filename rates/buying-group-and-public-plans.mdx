@@ -1,0 +1,33 @@
+---
+title: "Buying group and public plans"
+description: "The difference between Termina buying group rates and public plans in the rates API, why buying group rates don't name a retailer, how Termina's fee works, and when a public plan is recommended instead."
+---
+
+Every plan has an `offer_source`.
+
+| `offer_source` | What it is | Retailer shown |
+| --- | --- | --- |
+| `public` | A business plan any business can sign up to, from retailers' published plan data | Yes, with plan name and plan ID |
+| `termina_buying_group` | A rate negotiated by Termina for 10,000+ business locations, only available through Termina | No |
+
+Filter with `offer_source=public` or `offer_source=termina_buying_group`. The default, `all`, ranks both together by annual cost.
+
+## Why buying group rates don't name a retailer
+
+Termina doesn't publish which retailer offers each buying group rate. The retailer, the full contract terms and any exit fees are shown in the offer a business receives, before it signs.
+
+## Termina's fee
+
+Buying group prices in the API are before Termina's fee. Termina is paid 50% of the savings it delivers `[CONFIRM: measured against the cheapest public plan, and for how long]`, takes no commissions from retailers, and charges nothing if it doesn't save the business money. Public plans carry no Termina fee.
+
+## When a public plan is cheapest
+
+Sometimes a public plan beats every buying group rate. Then `summary.cheapest.offer_source` is `public`, and the right recommendation is that public plan. Termina switches businesses to the cheapest public plan for free and keeps checking every month for a better rate `[approved promise wording]`.
+
+## Plan IDs
+
+Public plans include a `plan_id`. Until Consumer Data Right plan IDs are loaded it's a stable Termina ID (`plan_id_type: "termina_offer"`). After that it's the CDR plan ID (`plan_id_type: "cdr"`), which can be looked up on [Energy Made Easy](https://www.energymadeeasy.gov.au).
+
+## Customer type
+
+`customer_type_verified: false` means a plan hasn't yet been confirmed as a business plan, and it carries a `customer_type_unverified` warning. `stats.lowest_public_verified_business_inc_gst` gives the cheapest public price counting verified business plans only.

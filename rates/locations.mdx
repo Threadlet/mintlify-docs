@@ -1,0 +1,46 @@
+---
+title: "Choosing a location"
+description: "Get business electricity rates by NMI, postcode, network, city or state. How the API resolves each, and what to do when a postcode is served by two networks."
+---
+
+Every request needs one location. The most specific one wins.
+
+| Parameter | Example | Use when |
+| --- | --- | --- |
+| `nmi` | `4102012345` | You have the site's NMI from a bill. The most precise; overrides everything else |
+| `postcode` | `2000` | You know where the site is |
+| `distributor` | `ausgrid` | You know the network (it's printed on the bill) |
+| `city` | `brisbane` | Comparing a city as a whole |
+| `state` | `NSW` | Comparing a state as a whole |
+
+`distributor` can also be combined with `postcode`, `city` or `state` to narrow them to one network, for example `?postcode=2620&distributor=evoenergy`. If the network doesn't serve that location, you get `400 distributor_location_mismatch`, with the networks that do.
+
+## Why the network matters
+
+In Australia, business electricity prices depend on the distribution network that supplies the site, not just the state. Each network has its own network charges and its own Default Market Offer or Victorian Default Offer. That's why the API resolves every location to one or more networks before costing plans.
+
+## Postcodes
+
+The API maps each postcode to the network or networks that serve it, using the postcode coverage retailers publish with their plans. 2,221 postcodes are covered.
+
+- **One network:** the response is for that network.
+- **Two or more networks** (for example 2620, split between Evoenergy in the ACT and Essential Energy in NSW): `location.ambiguous` is `true`, an `ambiguous_location` warning explains it, and plans from every network are returned, ranked together. Each plan's `network` says which it applies to. To narrow it down, ask for the NMI, or the network named on the bill, and pass it as `distributor`.
+- **No network** (WA and NT postcodes): `422 out_of_coverage`.
+
+`location.suburbs` lists the suburbs in the postcode.
+
+## NMI
+
+The NMI identifies the site's network directly, so it's the most reliable location. It's printed on every electricity bill, and the [bill extraction API](/quickstart) returns it.
+
+## Cities
+
+Capital cities use the ABS Greater Capital City areas (so `sydney` is Greater Sydney, and `canberra` is the ACT). Regional cities use ABS Significant Urban Areas. A city's rates cover every network serving at least 10% of its postcodes; networks serving only a few boundary postcodes are named in a `fringe_networks` warning.
+
+Some city slugs have short forms: `gold-coast` and `newcastle` work as well as `gold-coast-tweed-heads` and `newcastle-maitland`. See [Networks and cities](/rates/networks-and-cities) for every slug.
+
+## States
+
+`state` covers every network in the state, ranked together, with a `multiple_networks` warning. NSW has three networks, Victoria five and Queensland two. WA and NT aren't on the National Electricity Market and return `422 out_of_coverage`.
+
+When a response covers several networks, each network has its own benchmark. `summary.best_vs_benchmark_pct` gives the largest saving on any of them, for "up to X% less than the DMO".

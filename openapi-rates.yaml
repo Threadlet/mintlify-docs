@@ -1,0 +1,789 @@
+openapi: 3.1.0
+info:
+  title: Termina Business Electricity Rates API
+  version: 1.0.0
+  description: Compare business electricity rates across Australia's National Electricity Market. Returns every
+    costed plan for a location (Termina buying group rates and public market plans), each compared with the regulated
+    standing offer (Default Market Offer or Victorian Default Offer) at the same usage. Prices are annual and include
+    GST.
+  contact:
+    name: Termina
+    url: https://termina.com
+servers:
+- url: https://api.termina.com
+  description: Production
+tags:
+- name: Rates
+  description: Business electricity rates and benchmarks
+paths:
+  /v1/rates:
+    get:
+      operationId: getBusinessElectricityRates
+      tags:
+      - Rates
+      summary: Get business electricity rates
+      description: 'Returns the cheapest business electricity rates for a location, ranked by annual cost, with
+        the regulated benchmark (DMO or VDO) costed at the same usage, a `summary` block for answering questions
+        directly, and per-network detail.
+
+
+        Provide **one location**: `nmi`, `postcode`, `distributor`, `city` or `state`. `distributor` can also narrow
+        a postcode, city or state. `nmi` overrides everything else.
+
+
+        Locations served by several networks (a split postcode, a state, most cities) return plans from every network,
+        ranked together; each plan''s `network` says which it applies to.
+
+
+        Responses are cached for up to 1 hour. Rates are checked daily.'
+      parameters:
+      - name: postcode
+        in: query
+        description: Australian postcode (4 digits).
+        schema:
+          type: string
+          pattern: ^\d{4}$
+        example: '2000'
+      - name: distributor
+        in: query
+        description: Network slug, e.g. `ausgrid`. See [Networks and cities](/rates/networks-and-cities).
+        schema:
+          type: string
+          enum:
+          - ausgrid
+          - endeavour-energy
+          - essential-energy
+          - evoenergy
+          - energex
+          - ergon-energy
+          - sa-power-networks
+          - tasnetworks
+          - citipower
+          - powercor
+          - jemena
+          - united-energy
+          - ausnet-services
+        example: ausgrid
+      - name: nmi
+        in: query
+        description: National Meter Identifier (10 or 11 characters). The most precise location; overrides other
+          location parameters.
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9]{10,11}$
+      - name: city
+        in: query
+        description: City slug, e.g. `sydney`, `brisbane`, `gold-coast`. Capitals use ABS Greater Capital City areas;
+          regional cities use ABS Significant Urban Areas.
+        schema:
+          type: string
+        example: brisbane
+      - name: state
+        in: query
+        description: State or territory. WA and NT are not on the National Electricity Market and return 422.
+        schema:
+          type: string
+          enum:
+          - NSW
+          - VIC
+          - QLD
+          - SA
+          - TAS
+          - ACT
+          - WA
+          - NT
+        example: NSW
+      - name: usage_kwh
+        in: query
+        description: Annual usage in kWh (1,000 to 2,000,000). Defaults to 10,000 kWh, the AER and ESC small business
+          reference usage.
+        schema:
+          type: integer
+          minimum: 1000
+          maximum: 2000000
+          default: 10000
+        example: 25000
+      - name: peak_share
+        in: query
+        description: Share of annual usage in the peak period (0 to 1). Defaults to the network's typical profile.
+          `peak_share + shoulder_share` must not exceed 1.
+        schema:
+          type: number
+          minimum: 0
+          maximum: 1
+      - name: shoulder_share
+        in: query
+        description: Share of annual usage in the shoulder period (0 to 1). The rest is off-peak.
+        schema:
+          type: number
+          minimum: 0
+          maximum: 1
+      - name: max_demand_kw
+        in: query
+        description: Maximum demand in kW, used to cost demand charges. Defaults to the network's typical value.
+        schema:
+          type: number
+          minimum: 0
+          maximum: 10000
+      - name: offer_source
+        in: query
+        description: '`all` (default), `public` (public market plans only) or `termina_buying_group`.'
+        schema:
+          type: string
+          enum:
+          - all
+          - public
+          - termina_buying_group
+          default: all
+      - name: limit
+        in: query
+        description: Plans per page (1 to 50).
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 10
+      - name: cursor
+        in: query
+        description: '`pagination.next_cursor` from the previous page.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Rates for the location.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatesResponse'
+              example:
+                location:
+                  level: distributor
+                  input: ausgrid
+                  state: NSW
+                  city: null
+                  postcode: null
+                  suburbs: []
+                  networks:
+                  - id: ausgrid
+                    name: Ausgrid
+                    state: NSW
+                  ambiguous: false
+                usage:
+                  annual_kwh: 10000
+                  peak_share: null
+                  shoulder_share: null
+                  off_peak_share: null
+                  max_demand_kw: null
+                  assumed:
+                  - usage_kwh
+                  default_basis: regulator_reference
+                benchmark:
+                  name: Default Market Offer (Ausgrid)
+                  short_name: Default Market Offer
+                  abbreviation: DMO
+                  regulator: AER
+                  period: 2026-27
+                  annual_kwh: 10000
+                  annual_cost_inc_gst: 4523
+                  supply_c_per_day_inc_gst: 372.7476
+                  usage_c_per_kwh_inc_gst: 31.6293
+                  published_reference:
+                    annual_inc_gst: 4523
+                    usage_kwh: 10000
+                  source_url: https://www.aer.gov.au/industry/registers/resources/reviews/default-market-offer-2026-27
+                summary:
+                  usage_kwh: 10000
+                  checked_at: '2026-10-16'
+                  cheapest:
+                    offer_source: termina_buying_group
+                    network: ausgrid
+                    annual_cost_inc_gst: 2862
+                    vs_benchmark_pct: -36.7
+                    benchmark_abbreviation: DMO
+                  cheapest_buying_group:
+                    offer_source: termina_buying_group
+                    network: ausgrid
+                    annual_cost_inc_gst: 2862
+                    vs_benchmark_pct: -36.7
+                    benchmark_abbreviation: DMO
+                  cheapest_public:
+                    offer_source: public
+                    retailer: Future x Power
+                    plan_name: SME Cable Small Biz 25
+                    plan_id: termina-offer-12345
+                    plan_id_type: termina_offer
+                    network: ausgrid
+                    tariff_type: flat
+                    annual_cost_inc_gst: 3413
+                    vs_benchmark_pct: -24.5
+                    customer_type_verified: false
+                    benchmark_abbreviation: DMO
+                  buying_group_vs_cheapest_public_pct: -16.1
+                  best_vs_benchmark_pct: -36.7
+                  benchmarks:
+                  - network: ausgrid
+                    name: Default Market Offer
+                    abbreviation: DMO
+                    annual_cost_inc_gst: 4523
+                  coverage:
+                    networks: 1
+                    plans_compared: 353
+                    plans_public: 311
+                    plans_buying_group: 42
+                    retailers_public: 22
+                    plans_customer_type_unverified: 311
+                    public_comparison_available: true
+                  cheapest_public_by_retailer:
+                  - retailer: Future x Power
+                    plan_name: SME Cable Small Biz 25
+                    plan_id: termina-offer-12345
+                    plan_id_type: termina_offer
+                    network: ausgrid
+                    tariff_type: flat
+                    annual_cost_inc_gst: 3413
+                    vs_benchmark_pct: -24.5
+                    customer_type_verified: false
+                plans:
+                - plan_rank: 1
+                  offer_source: termina_buying_group
+                  retailer: null
+                  plan_name: null
+                  plan_id: null
+                  plan_id_type: null
+                  network: ausgrid
+                  tariff_type: flat
+                  annual_cost_inc_gst: 2862
+                  vs_standing_offer_pct: -36.7
+                  peak_c_per_kwh_inc_gst: 24.2
+                  shoulder_c_per_kwh_inc_gst: null
+                  off_peak_c_per_kwh_inc_gst: null
+                  supply_c_per_day_inc_gst: 121.3
+                  demand_per_kw_per_year_inc_gst: null
+                  contract_term_months: null
+                  exit_fee_inc_gst: null
+                  customer_type_verified: true
+                  warnings: []
+                pagination:
+                  page_size: 10
+                  page: 1
+                  total_pages: 36
+                  total_plans: 353
+                  returned: 10
+                  from_rank: 1
+                  to_rank: 10
+                  has_more: true
+                  next_cursor: eyJvIjoxMCwicCI6e30sImQiOltdfQ
+                next_cursor: eyJvIjoxMCwicCI6e30sImQiOltdfQ
+                warnings: []
+                page_url: https://termina.com/cheapest-business-electricity/ausgrid
+                meta:
+                  api_version: v1
+                  currency: AUD
+                  prices_include_gst: true
+                  source: Termina
+                  generated_at: '2026-10-16T00:00:00.000Z'
+        '400':
+          description: Invalid input. `error.code` says which parameter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: invalid_postcode
+                  message: postcode must be 4 digits.
+        '422':
+          description: No National Electricity Market network for the location (`out_of_coverage`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: out_of_coverage
+                  message: We don't have an electricity network for that postcode.
+                  details:
+                    input: '6000'
+        '429':
+          description: Rate limited (120 requests a minute per IP).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Rates data temporarily unavailable. Retry shortly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /health:
+    get:
+      operationId: getHealth
+      tags:
+      - Rates
+      summary: Health check
+      description: 'Returns `ok: true` when the rates data source is reachable.'
+      responses:
+        '200':
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+        '503':
+          description: Data source unavailable
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code. See [Errors and warnings](/rates/errors-and-warnings).
+              enum:
+              - missing_location
+              - invalid_postcode
+              - invalid_distributor
+              - invalid_nmi
+              - invalid_state
+              - unknown_city
+              - invalid_usage_kwh
+              - invalid_peak_share
+              - invalid_shoulder_share
+              - invalid_max_demand_kw
+              - invalid_usage_shares
+              - invalid_offer_source
+              - invalid_limit
+              - invalid_cursor
+              - distributor_location_mismatch
+              - out_of_coverage
+              - not_found
+              - method_not_allowed
+              - rate_limited
+              - upstream_unavailable
+              - internal_error
+            message:
+              type: string
+              description: Plain-language explanation.
+            details:
+              type: object
+              description: Extra context, e.g. allowed values or the networks serving a location.
+    Warning:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: Warning code. See [Errors and warnings](/rates/errors-and-warnings).
+          enum:
+          - ambiguous_location
+          - multiple_networks
+          - fringe_networks
+          - rates_not_available
+          - no_default_usage
+          - illustrative_profile
+        message:
+          type: string
+          description: Plain-language explanation, safe to show to a user.
+        network:
+          type: string
+          description: Set when the warning applies to one of several networks.
+    Location:
+      type: object
+      properties:
+        level:
+          type: string
+          description: Which location parameter was used.
+          enum:
+          - nmi
+          - postcode
+          - city
+          - state
+          - distributor
+        input:
+          type: string
+          description: The location value as given.
+        state:
+          type: &id001
+          - string
+          - 'null'
+          description: State, when the location is in one state.
+        city:
+          type:
+          - object
+          - 'null'
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            basis:
+              type: string
+              description: ABS area the city is based on.
+        postcode:
+          type: *id001
+        suburbs:
+          type: array
+          items:
+            type: string
+          description: Suburbs in the postcode (ABS data).
+        networks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Network'
+        ambiguous:
+          type: boolean
+          description: True when a postcode or NMI matches several networks; plans for all of them are returned.
+    Network:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Network slug.
+        name:
+          type: string
+        state:
+          type: *id001
+    Usage:
+      type:
+      - object
+      - 'null'
+      properties:
+        annual_kwh:
+          type: number
+          description: Annual usage the rates are costed at.
+        peak_share:
+          type: &id002
+          - number
+          - 'null'
+        shoulder_share:
+          type: *id002
+        off_peak_share:
+          type: *id002
+        max_demand_kw:
+          type: *id002
+        assumed:
+          type: array
+          items:
+            type: string
+          description: Inputs that used defaults rather than values you provided.
+        default_basis:
+          type: string
+          description: '`provided`, or `regulator_reference` (10,000 kWh).'
+          enum:
+          - provided
+          - regulator_reference
+    Benchmark:
+      type:
+      - object
+      - 'null'
+      description: The regulated standing offer for the network, costed from its unit prices at the same usage as
+        the plans. Null where no benchmark with unit prices is published (ACT, Ergon).
+      properties:
+        name:
+          type: string
+        short_name:
+          type: string
+          description: e.g. Default Market Offer.
+        abbreviation:
+          type: *id001
+          description: '`DMO`, `VDO` or `Aurora regulated tariff`.'
+        regulator:
+          type: string
+          enum:
+          - AER
+          - ESC
+          - OTTER
+        period:
+          type: string
+          description: e.g. 2026-27.
+        annual_kwh:
+          type: number
+          description: Always equals the plans' usage.
+        annual_cost_inc_gst:
+          type: number
+          description: The standing offer's annual cost at that usage, incl. GST.
+        supply_c_per_day_inc_gst:
+          type: number
+        usage_c_per_kwh_inc_gst:
+          type: number
+        published_reference:
+          type:
+          - object
+          - 'null'
+          description: The regulator's own headline figure, for verification only.
+          properties:
+            annual_inc_gst:
+              type: number
+            usage_kwh:
+              type: number
+        source_url:
+          type: string
+          description: The regulator's decision.
+    PublicPlanSummary:
+      type:
+      - object
+      - 'null'
+      description: A public plan, with retailer and plan ID. Never used for buying group rates.
+      properties:
+        retailer:
+          type: string
+          description: Retailer name.
+        plan_name:
+          type: string
+          description: Retailer's plan name.
+        plan_id:
+          type: *id001
+          description: Plan identifier. `termina-offer-…` until CDR plan IDs are loaded, then the CDR plan ID.
+        plan_id_type:
+          type: *id001
+          description: '`termina_offer` or `cdr`.'
+          enum:
+          - termina_offer
+          - cdr
+        network:
+          type: string
+          description: Network slug.
+        tariff_type:
+          type: *id001
+          description: '`flat`, `time_of_use` or `demand`.'
+        annual_cost_inc_gst:
+          type: number
+          description: Annual cost at the request's usage, incl. GST.
+        vs_benchmark_pct:
+          type: *id002
+          description: Annual cost vs the network's regulated benchmark, in %. Negative means cheaper. Null where
+            the network has no benchmark with unit prices.
+        customer_type_verified:
+          type:
+          - boolean
+          - 'null'
+          description: True when the plan is confirmed as a business plan.
+    Summary:
+      type: object
+      description: Everything needed to answer "what's the cheapest business electricity here?" across all networks
+        in the response. `summary.cheapest` always equals the first plan on page 1.
+      properties:
+        usage_kwh:
+          type: number
+        checked_at:
+          type: string
+          description: Date the rates were checked (Australia/Sydney).
+          format: date
+        cheapest:
+          type: object
+          description: 'The cheapest option overall: a buying group rate (no retailer named) or a public plan (with
+            retailer).'
+        cheapest_buying_group:
+          type:
+          - object
+          - 'null'
+          description: 'Cheapest Termina buying group rate: network, annual cost, % vs benchmark.'
+        cheapest_public:
+          $ref: '#/components/schemas/PublicPlanSummary'
+        buying_group_vs_cheapest_public_pct:
+          type: *id002
+          description: Cheapest buying group rate vs cheapest public plan, in %. Negative means the buying group
+            is cheaper.
+        best_vs_benchmark_pct:
+          type: *id002
+          description: The largest % below the benchmark on any network in the response. Use for "up to X% less".
+        benchmarks:
+          type: array
+          items:
+            type: object
+            properties:
+              network:
+                type: string
+              name:
+                type: string
+              abbreviation:
+                type: *id001
+              annual_cost_inc_gst:
+                type: number
+        coverage:
+          type: object
+          properties:
+            networks:
+              type: integer
+            plans_compared:
+              type: integer
+            plans_public:
+              type: integer
+            plans_buying_group:
+              type: integer
+            retailers_public:
+              type: integer
+            plans_customer_type_unverified:
+              type: integer
+            public_comparison_available:
+              type: boolean
+        cheapest_public_by_retailer:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicPlanSummary'
+          description: Each retailer's cheapest public plan, top 10.
+    Plan:
+      type: object
+      properties:
+        plan_rank:
+          type: integer
+          description: Rank by annual cost across all pages.
+        offer_source:
+          type: string
+          description: '`termina_buying_group` (rates negotiated by Termina, only available through Termina) or
+            `public` (public market plans).'
+          enum:
+          - termina_buying_group
+          - public
+        retailer:
+          type: *id001
+          description: 'Retailer, for public plans. Null for buying group rates: the retailer is named in the offer
+            before signing.'
+        plan_name:
+          type: *id001
+          description: Plan name, for public plans. Null for buying group rates.
+        plan_id:
+          type: *id001
+          description: Public plans only. `termina-offer-…` until CDR plan IDs are loaded, then the CDR plan ID.
+        plan_id_type:
+          type: *id001
+          enum:
+          - termina_offer
+          - cdr
+        network:
+          type: string
+          description: Network slug the plan applies to.
+        tariff_type:
+          type: string
+          enum:
+          - flat
+          - time_of_use
+          - demand
+        annual_cost_inc_gst:
+          type: number
+          description: Annual cost at the request's usage, incl. GST, before any Termina fee.
+        vs_standing_offer_pct:
+          type: *id002
+          description: Annual cost vs the network's benchmark at the same usage, in %. Negative means cheaper.
+        peak_c_per_kwh_inc_gst:
+          type: *id002
+          description: Peak, or single-rate, usage charge.
+        shoulder_c_per_kwh_inc_gst:
+          type: *id002
+        off_peak_c_per_kwh_inc_gst:
+          type: *id002
+        supply_c_per_day_inc_gst:
+          type: *id002
+        demand_per_kw_per_year_inc_gst:
+          type: *id002
+        contract_term_months:
+          type: &id003
+          - integer
+          - 'null'
+        exit_fee_inc_gst:
+          type: *id002
+        customer_type_verified:
+          type: boolean
+          description: False when the plan isn't yet confirmed as a business plan.
+        warnings:
+          type: array
+          items:
+            type: string
+            enum:
+            - no_supply_charge_found
+            - demand_not_costed
+            - customer_type_unverified
+    Pagination:
+      type: object
+      properties:
+        page_size:
+          type: integer
+        page:
+          type: integer
+        total_pages:
+          type: *id003
+        total_plans:
+          type: *id003
+        returned:
+          type: integer
+        from_rank:
+          type: *id003
+        to_rank:
+          type: *id003
+        has_more:
+          type: boolean
+        next_cursor:
+          type: *id001
+    RatesResponse:
+      type: object
+      properties:
+        location:
+          $ref: '#/components/schemas/Location'
+        usage:
+          $ref: '#/components/schemas/Usage'
+        benchmark:
+          $ref: '#/components/schemas/Benchmark'
+        stats:
+          type:
+          - object
+          - 'null'
+          description: Stats for the network, when exactly one applies. See `by_network` otherwise.
+        summary:
+          $ref: '#/components/schemas/Summary'
+        by_network:
+          type: array
+          items:
+            type: object
+            properties:
+              network:
+                $ref: '#/components/schemas/Network'
+              usage:
+                $ref: '#/components/schemas/Usage'
+              benchmark:
+                $ref: '#/components/schemas/Benchmark'
+              stats:
+                type: object
+        plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        next_cursor:
+          type: *id001
+          description: Same as `pagination.next_cursor`.
+        warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Warning'
+        page_url:
+          type: *id001
+          description: The matching page on termina.com.
+        meta:
+          type: object
+          properties:
+            api_version:
+              type: string
+            currency:
+              type: string
+            prices_include_gst:
+              type: boolean
+            source:
+              type: string
+            generated_at:
+              type: string
+              format: date-time

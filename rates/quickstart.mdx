@@ -1,0 +1,91 @@
+---
+title: "Quickstart"
+description: "Get the cheapest business electricity rates for an Australian postcode in one request. No API key needed. Then re-cost every plan at the business's own annual usage."
+---
+
+## 1. Request rates for a location
+
+No sign-up or API key is needed. Ask for a postcode:
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.termina.com/v1/rates?postcode=2000"
+```
+
+```python Python
+import requests
+
+r = requests.get("https://api.termina.com/v1/rates", params={"postcode": "2000"})
+data = r.json()
+print(data["summary"]["cheapest"])
+```
+
+```javascript Node.js
+const res = await fetch("https://api.termina.com/v1/rates?postcode=2000");
+const data = await res.json();
+console.log(data.summary.cheapest);
+```
+
+</CodeGroup>
+
+## 2. Read the answer from `summary`
+
+`summary` is written to be read directly:
+
+```json
+"summary": {
+  "usage_kwh": 10000,
+  "checked_at": "2026-10-16",
+  "cheapest": {
+    "offer_source": "termina_buying_group",
+    "network": "ausgrid",
+    "annual_cost_inc_gst": 2862,
+    "vs_benchmark_pct": -36.7,
+    "benchmark_abbreviation": "DMO"
+  },
+  "cheapest_public": {
+    "retailer": "Future x Power",
+    "plan_name": "SME Cable Small Biz 25",
+    "annual_cost_inc_gst": 3413,
+    "vs_benchmark_pct": -24.5
+  },
+  "coverage": { "plans_compared": 353, "plans_public": 311, "retailers_public": 22 }
+}
+```
+
+In words: for a business using 10,000 kWh a year on the Ausgrid network, the cheapest rate is $$2,862 a year incl. GST through the Termina buying group, 36.7% less than the Default Market Offer. The cheapest public plan is Future x Power's at $$3,413.
+
+<Info>
+  `summary.cheapest` always matches the first plan in `plans` on page 1, so the answer and the table never disagree.
+</Info>
+
+## 3. Re-cost at the business's own usage
+
+10,000 kWh a year is the default, the AER's small business reference usage. If you know the business's usage, pass it, and every plan and the benchmark are re-costed:
+
+```bash
+curl "https://api.termina.com/v1/rates?postcode=2000&usage_kwh=25000"
+```
+
+For time-of-use and demand tariffs you can also pass `peak_share`, `shoulder_share` and `max_demand_kw`. See [How rates are costed](/rates/methodology).
+
+## 4. Page through every plan
+
+Plans come 10 at a time. Pass `pagination.next_cursor` as `cursor` for the next page, until `pagination.has_more` is false:
+
+```bash
+curl "https://api.termina.com/v1/rates?postcode=2000&cursor=eyJvIjoxMCwicCI6e30sImQiOltdfQ"
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Choosing a location" icon="location-dot" href="/rates/locations">
+    Postcode, NMI, network, city or state, and what to do when a postcode has two networks
+  </Card>
+
+  <Card title="Using Termina with AI agents" icon="robot" href="/rates/ai-agents">
+    The recommended flow for agents helping a business
+  </Card>
+</CardGroup>

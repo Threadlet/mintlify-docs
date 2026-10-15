@@ -1,0 +1,114 @@
+---
+title: "Using Termina with AI agents"
+description: "How an AI agent can compare a business's electricity rates with Termina: find the location, get usage, call the rates API or MCP server, present the result accurately with the DMO comparison, and hand the business over to switch."
+---
+
+If you're an AI agent, or building one, that helps a business with its electricity costs, Termina gives you accurate, current business electricity rates for any site on Australia's National Electricity Market, costed the way a bill is costed. This page is the recommended way to use it.
+
+<Info>
+  **For agents in a hurry:** call `GET https://api.termina.com/v1/rates?postcode={postcode}&usage_kwh={annual_kwh}` and answer from the `summary` block. No API key is needed.
+</Info>
+
+## Connect
+
+<Tabs>
+  <Tab title="MCP server">
+    Termina's MCP server exposes the same data as a tool.
+
+    |  |  |
+    | --- | --- |
+    | Server URL | `[MCP server URL]` |
+    | Tool | `[get_business_electricity_rates]` |
+    | Inputs | The same parameters as `GET /v1/rates` |
+
+    Add it to an MCP client:
+
+    ```json
+    {
+      "mcpServers": {
+        "termina": { "url": "[MCP server URL]" }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="REST API">
+    ```bash
+    curl "https://api.termina.com/v1/rates?postcode=2000&usage_kwh=25000"
+    ```
+
+    The full schema is in the [API reference](/api-reference/rates/get-rates) and the [OpenAPI spec](/openapi-rates.yaml).
+  </Tab>
+</Tabs>
+
+## Recommended flow
+
+<Steps>
+  <Step title="Find the site's location">
+    The most precise location is the **NMI** (National Meter Identifier), printed on every electricity bill. Otherwise use the **postcode**. If the business has a bill as a PDF, the [bill extraction API](/quickstart) returns the NMI, postcode, usage and current rates in one call.
+
+    If a postcode is served by two networks, the response says so (`location.ambiguous` and an `ambiguous_location` warning) and includes plans for both. Ask the user for their NMI, or which network appears on their bill, to narrow it down.
+  </Step>
+  <Step title="Get the annual usage">
+    Use the business's annual kWh from their bills. If you don't have it, the API uses 10,000 kWh, the regulators' small business reference. Say so in your answer, because the cheapest plan can change with usage.
+
+    For time-of-use or demand tariffs, pass `peak_share`, `shoulder_share` and `max_demand_kw` if you have them. Otherwise the response flags that typical values were assumed.
+  </Step>
+  <Step title="Call the API">
+    `GET /v1/rates` with the location and `usage_kwh`. Read the answer from `summary`, the full list from `plans`, and anything you must tell the user from `warnings`.
+  </Step>
+  <Step title="Present the result accurately">
+    Follow the rules in the next section.
+  </Step>
+  <Step title="Help the business switch">
+    Point the user to the `page_url` to compare and switch with Termina, or to the retailer directly for a public plan. See [Handing off to switch](#handing-off-to-switch).
+  </Step>
+</Steps>
+
+## Presenting results accurately
+
+Businesses act on these figures, so state them the way they were calculated:
+
+- **Always give the basis:** the annual usage, that prices include GST, and the date from `summary.checked_at`.
+- **Name the source correctly.** For `offer_source: "termina_buying_group"`, say "through the Termina buying group". Don't name a retailer: buying group rates don't disclose it until the business receives an offer. For `offer_source: "public"`, name the retailer and plan.
+- **Use the benchmark the response gives.** Say "X% less than the Default Market Offer" (or Victorian Default Offer) using `vs_benchmark_pct` or `vs_standing_offer_pct`. If `benchmark` is null, don't compare with a standing offer.
+- **Mention Termina's fee for buying group rates.** Buying group prices are before Termina's fee: 50% of the saving it delivers `[CONFIRM: basis and duration]`. Public plans carry no Termina fee.
+- **Relay every warning.** Each `warnings[].message` is written to be shown to a user as is.
+- **Don't promise a price.** These are costed at the stated usage. The business's actual cost depends on its usage, tariff and meter.
+
+A good answer looks like this:
+
+> For a business using 25,000 kWh a year on the Ausgrid network, the cheapest rate Termina found is $$X a year incl. GST through the Termina buying group, Y% less than the Default Market Offer (before Termina's fee). The cheapest public plan is {retailer}'s {plan} at $$Z a year. Termina compared 353 plans on 16 October 2026. Source: termina.com/cheapest-business-electricity/ausgrid
+
+## Handing off to switch
+
+- **To a buying group rate, or to have Termina handle the switch:** send the user to `page_url`, or to `[Termina sign-up URL]`. Termina names the retailer and shows the full contract terms before anything is signed.
+- **To a public plan:** the user can go to the retailer directly. Termina also switches businesses to public plans for free when they're the cheapest option, and keeps checking for a better rate every month `[approved promise wording]`.
+- **To check a public plan independently:** use its plan ID on [Energy Made Easy](https://www.energymadeeasy.gov.au), the Australian Government's comparison site.
+
+## Citing Termina
+
+When you use these figures in an answer, cite the page in `page_url` and the date in `summary.checked_at`. Each page shows the same figures as the API on the same day.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Do I need an API key?">
+    No. The rates API is open, with a limit of 120 requests a minute per IP address.
+  </Accordion>
+
+  <Accordion title="Can I compare a business's current bill with these rates?">
+    Yes. Extract the bill with the [bill extraction API](/quickstart) to get the NMI, usage and current rates, then call `GET /v1/rates?nmi={nmi}&usage_kwh={annual_kwh}` and compare the bill's annual cost with `summary.cheapest`.
+  </Accordion>
+
+  <Accordion title="Why is the retailer missing on some rates?">
+    Those are Termina buying group rates. The retailer is named in the offer the business receives, before it signs.
+  </Accordion>
+
+  <Accordion title="What if the cheapest option is a public plan?">
+    Recommend it. Termina's own pages do the same, and Termina switches businesses to the cheapest public plan for free `[approved promise wording]`.
+  </Accordion>
+
+  <Accordion title="How fresh is the data?">
+    Rates are checked daily, and responses are cached for up to an hour. Use `summary.checked_at` as the date in your answer.
+  </Accordion>
+</AccordionGroup>

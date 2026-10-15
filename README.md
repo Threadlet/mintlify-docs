@@ -1,55 +1,53 @@
-# Mintlify Starter Kit
+# Rates API docs for docs.termina.com (Mintlify)
 
-Use the starter kit to get your docs deployed and ready to customize.
+Drafts to add the business electricity rates API to the Termina docs, written so AI agents can find it, understand it and use it correctly.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## What's here
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+| File | Goes to | Purpose |
+| --- | --- | --- |
+| `openapi-rates.yaml` | docs repo root | OpenAPI 3.1 spec for `GET /v1/rates` (validated). Mintlify builds the API reference from it |
+| `rates/overview.mdx` | `rates/` | What the API answers, coverage, FAQs |
+| `rates/quickstart.mdx` | `rates/` | First request, reading `summary`, re-costing, paging |
+| `rates/ai-agents.mdx` | `rates/` | **The key page for agents**: connect (MCP or REST), recommended flow, presenting results accurately, handing off to switch, citing |
+| `rates/locations.mdx` | `rates/` | NMI, postcode, network, city, state; split postcodes |
+| `rates/methodology.mdx` | `rates/` | How plans and benchmarks are costed; data sources |
+| `rates/buying-group-and-public-plans.mdx` | `rates/` | Offer sources, fee, promise, plan IDs, customer type |
+| `rates/errors-and-warnings.mdx` | `rates/` | Every error and warning code, and what to do |
+| `rates/networks-and-cities.mdx` | `rates/` | Every slug, generated from the API's own data files |
+| `api-reference/rates/get-rates.mdx` | `api-reference/rates/` | Reference page generated from the spec |
+| `docs.json.snippet.json` | merge into `docs.json` | Navigation for the new pages |
+| `index-additions.mdx` | merge into `index.mdx` | Homepage now introduces both APIs; two new FAQs |
+| `termina-com-llms-txt-additions.md` | termina.com `/llms.txt` | Points agents from the main site to the rates API |
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+## Before publishing
 
-## AI-assisted writing
+1. **Deploy rates API update 7.** These docs describe its `summary` block, benchmark labels, per-network stats, masked buying group rows, and the fixed `page_url` (most specific page: network, city, then state). The live API is on an earlier version.
+2. **Fill the placeholders** (search for `[`):
+   - `[MCP server URL]` and the tool name `[get_business_electricity_rates]`
+   - `[Termina sign-up URL]` for handing off to switch
+   - `[CONFIRM: basis and duration]` of the 50% fee
+   - `[approved promise wording]` (legal)
+   - `[CONFIRM: conditional discounts]` in the methodology
+3. **Decide on API keys.** The docs say "no API key". If you add keys later, update the overview, quickstart and FAQs.
+4. **Legal:** confirm redistributing Consumer Data Right plan data through a public API is allowed.
 
-Set up your AI coding tool to work with Mintlify:
+## Why each part helps agents find and use the API
 
-```bash
-npx skills add https://mintlify.com/docs
-```
+- **Descriptions are answer sentences.** Mintlify uses each page's `description` in `llms.txt` and in search snippets, so each one says what the page answers in plain terms ("Compare Australian business electricity rates for any postcode…").
+- **The OpenAPI spec is detailed.** Agents read field descriptions to decide how to call an API and interpret it. Every parameter has a range, default and example; every field says what it means and when it's null.
+- **One page tells agents exactly what to do.** `rates/ai-agents.mdx` gives the flow, the presentation rules (name the source, state usage, GST and date, relay warnings) and an example answer, which makes correct citation the easy path.
+- **Question-shaped FAQs** match how people and agents ask ("Is there an API for Australian business electricity rates?").
+- **Both directions are linked:** the main site's `llms.txt` points to the docs, the docs point to the rates pages via `page_url`, and every rates page should link "Get these rates as JSON" and "For developers and AI agents".
 
-This command installs Mintlify's documentation skill for your configured AI tools like Claude Code, Cursor, Windsurf, and others. The skill includes component reference, writing standards, and workflow guidance.
+## Also worth fixing in the existing docs
 
-See the [AI tools guides](/ai-tools) for tool-specific setup.
+- The intro repeats "No model training. No infrastructure. One endpoint." three times.
+- Stray backslashes (`\\`) in the card descriptions.
+- The quickstart calls `api.termina.io/v1/extract`, but the OpenAPI spec documents `/api/v2/public/bills/upload/`. Agents will try whichever they read first, so they need to match.
 
-## Development
+## After publishing
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
-
-```
-npm i -g mint
-```
-
-Run the following command at the root of your documentation, where your `docs.json` is located:
-
-```
-mint dev
-```
-
-View your local preview at `http://localhost:3000`.
-
-## Publishing changes
-
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
-
-## Need help?
-
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+- Submit the MCP server to the MCP Registry and the Claude and ChatGPT directories.
+- Check `https://docs.termina.com/llms.txt` lists the new pages with their descriptions.
+- Track API and MCP calls by referrer and user agent, to see which agents arrive and from where.

@@ -1,0 +1,49 @@
+---
+title: "How rates are costed"
+description: "How Termina costs business electricity plans: annual usage, time-of-use and demand charges, GST, and how each plan is compared with the Default Market Offer or Victorian Default Offer at the same usage."
+---
+
+Every plan is costed for a full year at the same usage, so plans are directly comparable.
+
+## Usage
+
+`usage_kwh` sets annual usage. It defaults to **10,000 kWh**, the reference usage the AER and ESC use for small business standing offers, and `usage.default_basis` tells you whether a default was used.
+
+For time-of-use plans, usage is split into peak, shoulder and off-peak using `peak_share` and `shoulder_share` (the rest is off-peak). For demand tariffs, `max_demand_kw` sets the demand that's charged. If you don't pass these, typical values for the network are used and an `illustrative_profile` warning says so.
+
+## Annual cost
+
+Each plan's `annual_cost_inc_gst` is:
+
+- the daily supply charge for 365 days, plus
+- usage charges for each period at its share of annual usage (stepped rates are currently costed at their first step), plus
+- demand charges at `max_demand_kw`, where the plan has them,
+- less percentage discounts published with the plan `[CONFIRM: conditional discounts]`,
+- with GST included.
+
+Rates in the response are in cents incl. GST: `peak_c_per_kwh_inc_gst` (or the single rate for flat plans), `shoulder_c_per_kwh_inc_gst`, `off_peak_c_per_kwh_inc_gst`, `supply_c_per_day_inc_gst`, and `demand_per_kw_per_year_inc_gst` in dollars.
+
+## Benchmarks
+
+Each network's regulated standing offer is costed from its published unit prices at **the same usage as the plans**, so the comparison is like for like.
+
+| Networks | Benchmark | Source |
+| --- | --- | --- |
+| Ausgrid, Endeavour Energy, Essential Energy, Energex, SA Power Networks | Default Market Offer (DMO) | AER 2026-27 determination, small business flat rate tariff caps |
+| CitiPower, Powercor, Jemena, United Energy, AusNet Services | Victorian Default Offer (VDO) | ESC 2026-27 small business flat tariffs |
+| TasNetworks | Aurora Energy regulated tariff | Aurora Energy Tariff 23, 2026-27 |
+| Evoenergy (ACT), Ergon Energy | None | No benchmark with published unit prices |
+
+`vs_standing_offer_pct` on each plan, and `vs_benchmark_pct` in `summary`, give the difference in %. Negative means cheaper than the standing offer. `benchmark.published_reference` holds the regulator's own headline figure, for checking against the source.
+
+## Data and freshness
+
+- **Public plans:** retailers' published business plans under the Consumer Data Right, the data behind Energy Made Easy.
+- **Buying group rates:** Termina's negotiated offers.
+- **Postcodes and cities:** postcode coverage published with retailers' plans, and ABS (ASGS 2021) geography.
+
+Rates are checked daily and API responses are cached for up to an hour. Benchmarks are updated each July when the regulators publish new prices.
+
+## Limits
+
+The costing uses the usage and shares you provide. A business's real bill also depends on its meter, any controlled load, solar exports and its actual time-of-use pattern, so treat results as a comparison, and confirm against the business's bill before switching.

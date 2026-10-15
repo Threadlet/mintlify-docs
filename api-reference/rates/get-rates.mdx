@@ -1,0 +1,305 @@
+---
+title: "Get business electricity rates"
+description: "GET /v1/rates returns the cheapest business electricity rates for an Australian postcode, network, city, state or NMI, costed at your annual usage incl. GST and compared with the DMO or VDO at the same usage."
+openapi: "/openapi-rates.yaml GET /v1/rates"
+---
+
+Returns every costed business electricity plan for a location, ranked by annual cost, with the regulated benchmark costed at the same usage and a `summary` block that answers "what's the cheapest rate here?" directly.
+
+- **Base URL:** `https://api.termina.com`
+- **Authentication:** none
+- **Rate limit:** 120 requests a minute per IP address
+- **Caching:** up to 1 hour. Rates are checked daily
+
+## Location
+
+Pass **one** location. The most specific wins: `nmi`, then `postcode`, `distributor`, `city`, `state`. `distributor` can also narrow a postcode, city or state to one network. See [Choosing a location](/rates/locations) and [Supported networks, cities and states](/rates/networks-and-cities).
+
+## Examples
+
+<Tabs>
+  <Tab title="Postcode">
+    The cheapest rates for a postcode, at the default 10,000 kWh a year:
+
+    ```bash
+    curl "https://api.termina.com/v1/rates?postcode=2000"
+    ```
+  </Tab>
+  <Tab title="NMI and usage">
+    The most precise request: the site's NMI and annual usage, both from a bill:
+
+    ```bash
+    curl "https://api.termina.com/v1/rates?nmi=4102012345&usage_kwh=25000"
+    ```
+  </Tab>
+  <Tab title="Time of use and demand">
+    Re-cost time-of-use and demand plans with the site's own profile:
+
+    ```bash
+    curl "https://api.termina.com/v1/rates?postcode=3000&usage_kwh=40000&peak_share=0.4&shoulder_share=0.3&max_demand_kw=25"
+    ```
+  </Tab>
+  <Tab title="Split postcode">
+    2620 is served by two networks. Without `distributor` you get plans for both, flagged with `ambiguous_location`; with it, one network:
+
+    ```bash
+    curl "https://api.termina.com/v1/rates?postcode=2620&distributor=evoenergy"
+    ```
+  </Tab>
+  <Tab title="State or city">
+    Every network in the area, ranked together:
+
+    ```bash
+    curl "https://api.termina.com/v1/rates?state=NSW"
+    curl "https://api.termina.com/v1/rates?city=brisbane"
+    ```
+  </Tab>
+  <Tab title="Public plans only">
+    Only plans any business can sign up to directly:
+
+    ```bash
+    curl "https://api.termina.com/v1/rates?distributor=ausgrid&offer_source=public&limit=50"
+    ```
+  </Tab>
+</Tabs>
+
+## Reading the response
+
+| Field | What it holds |
+| --- | --- |
+| `summary` | The answer: cheapest option overall, cheapest public plan with its retailer, cheapest buying group rate, % vs the benchmark, coverage and the date checked |
+| `plans` | Every costed plan on this page, ranked by annual cost |
+| `benchmark` | The network's DMO, VDO or Aurora regulated tariff, costed at the same usage as the plans. Null for the ACT and Ergon |
+| `usage` | The usage the plans are costed at, and which inputs were defaults |
+| `location` | How the location was resolved: networks, state, suburbs, and whether it's ambiguous |
+| `by_network` | Usage, benchmark and stats for each network, when a response covers several |
+| `stats` | Counts, lowest prices and rate percentiles, when a response covers one network |
+| `pagination` | Page, totals and `next_cursor` |
+| `warnings` | Anything to tell the user, written to be shown as is |
+| `page_url` | The matching page on termina.com, to cite or send the user to |
+
+The fields you'll use most:
+
+<ResponseField name="summary.cheapest" type="object">
+  The cheapest option overall. Always the same as the first plan on page 1. `offer_source` is `termina_buying_group` (no retailer named) or `public` (with retailer, plan name and plan ID).
+</ResponseField>
+
+<ResponseField name="summary.cheapest_public" type="object | null">
+  The cheapest public plan, with retailer, plan name, plan ID, annual cost and % vs the benchmark.
+</ResponseField>
+
+<ResponseField name="plans[].annual_cost_inc_gst" type="number">
+  The plan's cost for a year at `usage.annual_kwh`, incl. GST. For buying group rates this is before Termina's fee.
+</ResponseField>
+
+<ResponseField name="plans[].vs_standing_offer_pct" type="number | null">
+  The plan vs the network's DMO or VDO at the same usage, in %. Negative means cheaper. Null where there's no benchmark.
+</ResponseField>
+
+<ResponseField name="summary.checked_at" type="string">
+  The date the rates were checked. Quote it alongside any figure.
+</ResponseField>
+
+## Pagination
+
+Plans come back 10 per page by default (`limit` up to 50). While `pagination.has_more` is true, pass `pagination.next_cursor` back as `cursor`, with the same other parameters. When a response covers several networks, the cursor keeps each network's place, so you get every plan exactly once.
+
+## Errors
+
+Errors return `{ "error": { "code", "message", "details" } }` with status 400 (invalid input), 404, 422 (`out_of_coverage`, for example WA or NT), 429 (rate limited) or 503 (try again shortly). See [Errors and warnings](/rates/errors-and-warnings) for every code.
+
+<RequestExample>
+
+```bash cURL
+curl "https://api.termina.com/v1/rates?distributor=ausgrid&usage_kwh=10000"
+```
+
+```python Python
+import requests
+
+r = requests.get(
+    "https://api.termina.com/v1/rates",
+    params={"distributor": "ausgrid", "usage_kwh": 10000},
+)
+summary = r.json()["summary"]
+print(summary["cheapest"], summary["cheapest_public"])
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.termina.com/v1/rates?distributor=ausgrid&usage_kwh=10000"
+);
+const { summary } = await res.json();
+console.log(summary.cheapest, summary.cheapest_public);
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "location": {
+    "level": "distributor",
+    "input": "ausgrid",
+    "state": "NSW",
+    "city": null,
+    "postcode": null,
+    "suburbs": [],
+    "networks": [
+      {
+        "id": "ausgrid",
+        "name": "Ausgrid",
+        "state": "NSW"
+      }
+    ],
+    "ambiguous": false
+  },
+  "usage": {
+    "annual_kwh": 10000,
+    "peak_share": null,
+    "shoulder_share": null,
+    "off_peak_share": null,
+    "max_demand_kw": null,
+    "assumed": [
+      "usage_kwh"
+    ],
+    "default_basis": "regulator_reference"
+  },
+  "benchmark": {
+    "name": "Default Market Offer (Ausgrid)",
+    "short_name": "Default Market Offer",
+    "abbreviation": "DMO",
+    "regulator": "AER",
+    "period": "2026-27",
+    "annual_kwh": 10000,
+    "annual_cost_inc_gst": 4523,
+    "supply_c_per_day_inc_gst": 372.7476,
+    "usage_c_per_kwh_inc_gst": 31.6293,
+    "published_reference": {
+      "annual_inc_gst": 4523,
+      "usage_kwh": 10000
+    },
+    "source_url": "https://www.aer.gov.au/industry/registers/resources/reviews/default-market-offer-2026-27"
+  },
+  "summary": {
+    "usage_kwh": 10000,
+    "checked_at": "2026-10-16",
+    "cheapest": {
+      "offer_source": "termina_buying_group",
+      "network": "ausgrid",
+      "annual_cost_inc_gst": 2862,
+      "vs_benchmark_pct": -36.7,
+      "benchmark_abbreviation": "DMO"
+    },
+    "cheapest_buying_group": {
+      "offer_source": "termina_buying_group",
+      "network": "ausgrid",
+      "annual_cost_inc_gst": 2862,
+      "vs_benchmark_pct": -36.7,
+      "benchmark_abbreviation": "DMO"
+    },
+    "cheapest_public": {
+      "offer_source": "public",
+      "retailer": "Future x Power",
+      "plan_name": "SME Cable Small Biz 25",
+      "plan_id": "termina-offer-12345",
+      "plan_id_type": "termina_offer",
+      "network": "ausgrid",
+      "tariff_type": "flat",
+      "annual_cost_inc_gst": 3413,
+      "vs_benchmark_pct": -24.5,
+      "customer_type_verified": false,
+      "benchmark_abbreviation": "DMO"
+    },
+    "buying_group_vs_cheapest_public_pct": -16.1,
+    "best_vs_benchmark_pct": -36.7,
+    "benchmarks": [
+      {
+        "network": "ausgrid",
+        "name": "Default Market Offer",
+        "abbreviation": "DMO",
+        "annual_cost_inc_gst": 4523
+      }
+    ],
+    "coverage": {
+      "networks": 1,
+      "plans_compared": 353,
+      "plans_public": 311,
+      "plans_buying_group": 42,
+      "retailers_public": 22,
+      "plans_customer_type_unverified": 311,
+      "public_comparison_available": true
+    },
+    "cheapest_public_by_retailer": [
+      {
+        "retailer": "Future x Power",
+        "plan_name": "SME Cable Small Biz 25",
+        "plan_id": "termina-offer-12345",
+        "plan_id_type": "termina_offer",
+        "network": "ausgrid",
+        "tariff_type": "flat",
+        "annual_cost_inc_gst": 3413,
+        "vs_benchmark_pct": -24.5,
+        "customer_type_verified": false
+      }
+    ]
+  },
+  "plans": [
+    {
+      "plan_rank": 1,
+      "offer_source": "termina_buying_group",
+      "retailer": null,
+      "plan_name": null,
+      "plan_id": null,
+      "plan_id_type": null,
+      "network": "ausgrid",
+      "tariff_type": "flat",
+      "annual_cost_inc_gst": 2862,
+      "vs_standing_offer_pct": -36.7,
+      "peak_c_per_kwh_inc_gst": 24.2,
+      "shoulder_c_per_kwh_inc_gst": null,
+      "off_peak_c_per_kwh_inc_gst": null,
+      "supply_c_per_day_inc_gst": 121.3,
+      "demand_per_kw_per_year_inc_gst": null,
+      "contract_term_months": null,
+      "exit_fee_inc_gst": null,
+      "customer_type_verified": true,
+      "warnings": []
+    }
+  ],
+  "pagination": {
+    "page_size": 10,
+    "page": 1,
+    "total_pages": 36,
+    "total_plans": 353,
+    "returned": 10,
+    "from_rank": 1,
+    "to_rank": 10,
+    "has_more": true,
+    "next_cursor": "eyJvIjoxMCwicCI6e30sImQiOltdfQ"
+  },
+  "next_cursor": "eyJvIjoxMCwicCI6e30sImQiOltdfQ",
+  "warnings": [],
+  "page_url": "https://termina.com/cheapest-business-electricity/ausgrid",
+  "meta": {
+    "api_version": "v1",
+    "currency": "AUD",
+    "prices_include_gst": true,
+    "source": "Termina",
+    "generated_at": "2026-10-16T00:00:00.000Z"
+  }
+}
+```
+
+```json 422
+{
+  "error": {
+    "code": "out_of_coverage",
+    "message": "We don't have an electricity network for that postcode.",
+    "details": { "input": "6000" }
+  }
+}
+```
+
+</ResponseExample>

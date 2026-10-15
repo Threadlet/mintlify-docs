@@ -1,0 +1,56 @@
+---
+title: "Errors and warnings"
+description: "Every error code and warning the business electricity rates API returns, what each means, and what an agent or app should do about it."
+---
+
+## Errors
+
+Errors return a non-200 status and this shape:
+
+```json
+{ "error": { "code": "invalid_postcode", "message": "postcode must be 4 digits.", "details": {} } }
+```
+
+| Status | Code | Meaning | What to do |
+| --- | --- | --- | --- |
+| 400 | `missing_location` | No location given | Pass one of `nmi`, `postcode`, `distributor`, `city`, `state` |
+| 400 | `invalid_postcode` | Not 4 digits | Fix the postcode |
+| 400 | `invalid_nmi` | Not 10 or 11 letters and digits | Check the NMI on the bill |
+| 400 | `invalid_distributor` | Not a network slug | Use a slug from [Networks and cities](/rates/networks-and-cities) |
+| 400 | `invalid_state` | Unknown state | Use NSW, VIC, QLD, SA, TAS or ACT |
+| 400 | `unknown_city` | Unknown city | `details.examples` lists valid slugs |
+| 400 | `distributor_location_mismatch` | The network doesn't serve that location | `details.networks_serving_location` lists the ones that do |
+| 400 | `invalid_usage_kwh` | Not a whole number from 1,000 to 2,000,000 | Fix the usage |
+| 400 | `invalid_peak_share`, `invalid_shoulder_share` | Not between 0 and 1 | Fix the share |
+| 400 | `invalid_usage_shares` | `peak_share` + `shoulder_share` is more than 1 | Reduce one of them |
+| 400 | `invalid_max_demand_kw` | Not between 0 and 10,000 | Fix the demand |
+| 400 | `invalid_offer_source` | Not `all`, `public` or `termina_buying_group` | Fix the value |
+| 400 | `invalid_limit` | Not 1 to 50 | Fix the value |
+| 400 | `invalid_cursor` | Not a cursor from this API | Use `pagination.next_cursor` unchanged |
+| 404 | `not_found` | Unknown endpoint | Use `/v1/rates` |
+| 422 | `out_of_coverage` | No National Electricity Market network for the location (for example WA or NT) | Tell the user the location isn't covered |
+| 429 | `rate_limited` | More than 120 requests a minute | Wait a minute and retry |
+| 503 | `upstream_unavailable` | Rates data temporarily unavailable | Retry shortly |
+
+## Warnings
+
+Warnings come back with a 200 response, in `warnings`. Each `message` is written to be shown to a user as is. When a response covers several networks, a warning that applies to one of them includes `network`.
+
+| Code | Meaning | What to do |
+| --- | --- | --- |
+| `ambiguous_location` | The postcode or NMI matches several networks; plans for all of them are returned | Ask for the NMI or the network on the bill, then pass `distributor` |
+| `multiple_networks` | A state or city covers several networks, each with its own benchmark | Show each plan's network; say "up to" for the % saving |
+| `fringe_networks` | A few of a city's boundary postcodes are served by other networks, not included | Use a postcode for an exact match |
+| `illustrative_profile` | Typical time-of-use split and demand were assumed | Pass `peak_share`, `shoulder_share` and `max_demand_kw` for the site |
+| `no_default_usage` | No usage could be set for this location | Pass `usage_kwh` |
+| `rates_not_available` | Termina doesn't have rates for this network yet | Tell the user |
+
+## Plan warnings
+
+Each plan has its own `warnings` list:
+
+| Code | Meaning |
+| --- | --- |
+| `customer_type_unverified` | Not yet confirmed as a business plan |
+| `no_supply_charge_found` | The plan's supply charge couldn't be found, so its cost may be understated |
+| `demand_not_costed` | The plan has demand charges but no demand was given, so its cost is understated |

@@ -29,7 +29,13 @@
         "tab": "API Reference",
         "openapi": "openapi.yaml",
         "pages": [
-          "api-reference/bills/upload"
+          "api-reference/bills/upload",
+          {
+            "group": "rates",
+            "pages": [
+              "api-reference/rates/get-rates"
+            ]
+          }
         ]
       }
     ]
