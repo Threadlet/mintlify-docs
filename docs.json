@@ -16,25 +16,25 @@
     "tabs": [
       {
         "tab": "Documentation",
-        "groups": [
+        "pages": [
           {
             "group": "Getting Started",
             "pages": [
-              "index (1)",
-              "quickstart"
+              "index"
             ]
           },
           {
             "group": "Bill extraction API reference",
             "pages": [
+              "quickstart",
               "api-reference/bills/upload"
             ]
           },
           {
             "group": "Business electricity rates",
             "pages": [
+              "rates/quickstart-1",
               "rates/overview",
-              "rates/quickstart",
               "rates/buying-group-and-public-plans",
               "rates/locations",
               "rates/ai-agents",
@@ -43,6 +43,7 @@
               "rates/networks-and-cities"
             ]
           },
+          "rates/quickstart",
           {
             "group": "Rates API reference",
             "pages": [
