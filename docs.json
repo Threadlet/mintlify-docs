@@ -16,38 +16,37 @@
     "tabs": [
       {
         "tab": "Documentation",
-        "pages": [
+        "groups": [
           {
             "group": "Getting Started",
             "pages": [
-              "index"
+              "index",
+              "quickstart"
             ]
           },
           {
             "group": "Bill extraction API reference",
             "pages": [
-              "quickstart",
               "api-reference/bills/upload"
             ]
           },
           {
             "group": "Business electricity rates",
             "pages": [
-              "rates/quickstart-1",
               "rates/overview",
-              "rates/buying-group-and-public-plans",
-              "rates/locations",
+              "rates/quickstart",
               "rates/ai-agents",
-              "rates/methodology-1",
+              "rates/locations",
+              "rates/methodology",
+              "rates/buying-group-and-public-plans",
               "rates/errors-and-warnings",
               "rates/networks-and-cities"
             ]
           },
-          "rates/quickstart",
           {
             "group": "Rates API reference",
             "pages": [
-              "documentation/rates-api-reference/get-rates"
+              "api-reference/rates/get-rates"
             ]
           }
         ]
