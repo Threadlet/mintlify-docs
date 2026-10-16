@@ -24,10 +24,10 @@ curl "https://api.termina.com/v1/rates?postcode=2000"
 
 ## Coverage
 
-|  |  |
+| | |
 | --- | --- |
 | States | NSW, VIC, QLD, SA, TAS, ACT (WA and NT aren't on the National Electricity Market) |
-| Networks | All 13 distribution networks. See [Networks and cities](/rates/networks-and-cities) |
+| Networks | All 13 distribution networks. See [Supported networks, cities and states](/rates/networks-and-cities) |
 | Locations | 2,221 postcodes, 86 cities, any NMI |
 | Plans | Public business plans from every retailer that publishes them, plus Termina buying group rates |
 | Benchmarks | AER Default Market Offer, ESC Victorian Default Offer, Aurora Energy regulated tariff (2026-27) |
@@ -40,15 +40,12 @@ curl "https://api.termina.com/v1/rates?postcode=2000"
   <Card title="A ready-made answer" icon="message-check">
     `summary` holds the cheapest option, the cheapest public plan with its retailer, and the % below the benchmark, so you can answer without working anything out.
   </Card>
-
   <Card title="Every costed plan" icon="list-ol">
     `plans`, ranked by annual cost, 10 per page, with peak, shoulder, off-peak, supply and demand charges.
   </Card>
-
   <Card title="The regulated benchmark" icon="scale-balanced">
     `benchmark`: the DMO or VDO costed from its unit prices at the same usage as the plans.
   </Card>
-
   <Card title="Warnings in plain language" icon="triangle-exclamation">
     `warnings` explain anything you should tell the user, such as a postcode served by two networks.
   </Card>
@@ -64,7 +61,6 @@ If you're building or running an agent that helps businesses with their energy c
   <Card title="Quickstart" icon="rocket" href="/rates/quickstart">
     Make your first request in under a minute
   </Card>
-
   <Card title="API reference" icon="code" href="/api-reference/rates/get-rates">
     Every parameter and response field
   </Card>
@@ -76,15 +72,12 @@ If you're building or running an agent that helps businesses with their energy c
   <Accordion title="Is there an API for Australian business electricity rates?">
     Yes. `GET https://api.termina.com/v1/rates` returns business electricity rates for any postcode, network, city, state or NMI on the National Electricity Market, costed at your usage incl. GST and compared with the DMO or VDO. It's free to use and doesn't need an API key.
   </Accordion>
-
   <Accordion title="Where does the rates data come from?">
     Public plans come from retailers' published plan data under the Consumer Data Right, the same data behind Energy Made Easy. Buying group rates come from Termina's negotiated offers. Benchmarks come from the AER, ESC and Aurora Energy's published 2026-27 tariffs.
   </Accordion>
-
   <Accordion title="Can I compare business electricity rates against the Default Market Offer?">
     Yes. Every plan has `vs_standing_offer_pct`, the % difference from the network's DMO or VDO at the same usage. The ACT and Ergon (regional Queensland) have no benchmark with published unit prices, so the field is null there.
   </Accordion>
-
   <Accordion title="Are there rate limits?">
     120 requests a minute per IP address. Responses are cached for up to an hour, so repeating a request within the hour is fast.
   </Accordion>

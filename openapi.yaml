@@ -3,6 +3,9 @@ info:
   title: Termina Public API
   version: 1.0.0
   description: Public API for programmatic access to Termina services.
+servers:
+- url: https://termina.io
+  description: Production
 paths:
   /api/v2/public/bills/upload/:
     post:

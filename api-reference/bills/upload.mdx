@@ -1,7 +1,8 @@
 ---
 title: "Upload"
+description: "POST an energy bill PDF and get structured JSON back: retailer, account, billing period, every charge with its tariff rates, meter reads and validation issues."
+openapi: "POST /api/v2/public/bills/upload/"
 ---
-
 The bill upload endpoint accepts an energy bill PDF and returns structured billing data in a single request. Data will be validated on this endpoint in the pro plan. You send the file as `multipart/form-data`, and Termina extracts the retailer, account details, billing period, every charge line item with its tariff rates, and meter reads, then returns them as JSON alongside any validation issues that need review.
 
 It works for Australian, New Zealand, British and United States electricity, gas, and LPG bills across all major retailers.
@@ -13,7 +14,7 @@ Every request must include your API key in the `X-API-Key` header. Requests with
 ## Example request
 
 ```bash
-curl -X POST https://api.termina.io/api/v2/public/bills/upload/ \
+curl -X POST https://termina.io/api/v2/public/bills/upload/ \
   -H "X-API-Key: your-api-key-here" \
   -F "file=@energy-bill.pdf"
 ```
@@ -78,17 +79,17 @@ curl -X POST https://api.termina.io/api/v2/public/bills/upload/ \
 
 The response has three top-level fields:
 
-- **`bill_uuid`**: a unique identifier for the stored bill, used to reference it in later calls.
-- **`energy_data`**: the structured bill. This includes the retailer, account number, supply address, billing period, invoice and due dates, a full list of itemised charges (each classified and broken into tariff rate steps), totals, and meter reads. It is `null` if the bill could not be parsed.
-- **`validation_issues`**: a list of anything that needs attention, each with a severity (`WARNING`, `ERROR`, or `ERROR_IGNORABLE`), the affected field, and a message.
+* **`bill_uuid`**: a unique identifier for the stored bill, used to reference it in later calls.
+* **`energy_data`**: the structured bill. This includes the retailer, account number, supply address, billing period, invoice and due dates, a full list of itemised charges (each classified and broken into tariff rate steps), totals, and meter reads. It is `null` if the bill could not be parsed.
+* **`validation_issues`**: a list of anything that needs attention, each with a severity (`WARNING`, `ERROR`, or `ERROR_IGNORABLE`), the affected field, and a message.
 
 ## Common use cases
 
-- **Procurement and bill validation**: confirm a retailer has billed the correct rates against a contract.
-- **Tariff comparison**: extract current rates to benchmark against alternative offers.
-- **Emissions and AASB S2 reporting**: pull consumption and meter data as a structured input for Scope 2 reporting.
-- **Portfolio management**: ingest bills across multiple sites without manual data entry.
-- **Embedded Products**: Expose actions on your application when pricing or billing usage is required.
+* **Procurement and bill validation**: confirm a retailer has billed the correct rates against a contract.
+* **Tariff comparison**: extract current rates to benchmark against alternative offers.
+* **Emissions and AASB S2 reporting**: pull consumption and meter data as a structured input for Scope 2 reporting.
+* **Portfolio management**: ingest bills across multiple sites without manual data entry.
+* **Embedded Products**: Expose actions on your application when pricing or billing usage is required.
 
 ## Frequently asked questions
 
@@ -102,11 +103,11 @@ The response has three top-level fields:
   </Accordion>
 
   <Accordion title="What data fields are returned in the response?">
-    Over 30 fields including: retailer and account details, NMI/MIRN, supply address, billing period, invoice and due dates, every charge line item with its classification and tariff rate steps, time-of-use consumption breakdowns (peak, off-peak, shoulder), demand, meter readings, bill totals, and GST. See the full  for every field and type.
+    Over 30 fields including: retailer and account details, NMI/MIRN, supply address, billing period, invoice and due dates, every charge line item with its classification and tariff rate steps, time-of-use consumption breakdowns (peak, off-peak, shoulder), demand, meter readings, bill totals, and GST. The response schema on this page lists every field and type.
   </Accordion>
 
   <Accordion title="Can the endpoint extract time-of-use tariff data?">
-    Yes. Where time-of-use pricing is present on the bill, Termina extracts peak, off-peak, and shoulder rates and consumption separately — including the tariff rate steps and the kWh consumed in each period. See  for the full field reference.
+    Yes. Where time-of-use pricing is present on the bill, Termina extracts peak, off-peak, and shoulder rates and consumption separately — including the tariff rate steps and the kWh consumed in each period. The response schema on this page has the full field reference.
   </Accordion>
 
   <Accordion title="What happens if a bill cannot be fully parsed?">
@@ -118,10 +119,10 @@ The response has three top-level fields:
   </Accordion>
 
   <Accordion title="How do I authenticate requests to this endpoint?">
-    Include your API key in the `X-API-Key` request header. You can generate a free key instantly — no credit card required. See the  for full authentication details and code examples.
+    Include your API key in the `X-API-Key` request header. You can generate a free key instantly — no credit card required. See the [quickstart](/quickstart) for authentication details and code examples.
   </Accordion>
 
   <Accordion title="What is the rate limit on the bill upload endpoint?">
-    Free tier accounts can process up to 50 bills total. Pro accounts have configurable rate limits based on your plan. The API returns a `429` status code with a `Retry-After` header if you exceed your limit. See  for all status codes.
+    Free tier accounts can process up to 50 bills total. Pro accounts have configurable rate limits based on your plan. The API returns a `429` status code with a `Retry-After` header if you exceed your limit.
   </Accordion>
 </AccordionGroup>

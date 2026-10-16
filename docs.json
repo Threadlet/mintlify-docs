@@ -7,10 +7,16 @@
     "light": "#22C55E",
     "dark": "#15803D"
   },
-  "favicon": "/favicon.svg",
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "api": {
+    "openapi": "openapi.yaml"
+  },
+  "markdown": {
+    "schema": true
   },
   "navigation": {
     "tabs": [
@@ -52,11 +58,5 @@
         ]
       }
     ]
-  },
-  "api": {
-    "openapi": "/openapi.yaml"
-  },
-  "markdown": {
-    "schema": true
   }
 }

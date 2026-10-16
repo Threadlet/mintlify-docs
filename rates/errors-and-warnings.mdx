@@ -16,7 +16,7 @@ Errors return a non-200 status and this shape:
 | 400 | `missing_location` | No location given | Pass one of `nmi`, `postcode`, `distributor`, `city`, `state` |
 | 400 | `invalid_postcode` | Not 4 digits | Fix the postcode |
 | 400 | `invalid_nmi` | Not 10 or 11 letters and digits | Check the NMI on the bill |
-| 400 | `invalid_distributor` | Not a network slug | Use a slug from [Networks and cities](/rates/networks-and-cities) |
+| 400 | `invalid_distributor` | Not a network slug | Use a slug from [Supported networks, cities and states](/rates/networks-and-cities) |
 | 400 | `invalid_state` | Unknown state | Use NSW, VIC, QLD, SA, TAS or ACT |
 | 400 | `unknown_city` | Unknown city | `details.examples` lists valid slugs |
 | 400 | `distributor_location_mismatch` | The network doesn't serve that location | `details.networks_serving_location` lists the ones that do |
