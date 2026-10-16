@@ -554,6 +554,7 @@ components:
           enum:
           - termina_offer
           - cdr
+          - null
         network:
           type: string
           description: Network slug.
@@ -664,6 +665,7 @@ components:
           enum:
           - termina_offer
           - cdr
+          - null
         network:
           type: string
           description: Network slug the plan applies to.
