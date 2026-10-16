@@ -18,7 +18,7 @@ Each plan's `annual_cost_inc_gst` is:
 - the daily supply charge for 365 days, plus
 - usage charges for each period at its share of annual usage (stepped rates are currently costed at their first step), plus
 - demand charges at `max_demand_kw`, where the plan has them,
-- less percentage discounts published with the plan `[CONFIRM: conditional discounts]`,
+- less percentage discounts published with the plan, including conditional ones such as pay-on-time discounts,
 - with GST included.
 
 Rates in the response are in cents incl. GST: `peak_c_per_kwh_inc_gst` (or the single rate for flat plans), `shoulder_c_per_kwh_inc_gst`, `off_peak_c_per_kwh_inc_gst`, `supply_c_per_day_inc_gst`, and `demand_per_kw_per_year_inc_gst` in dollars.

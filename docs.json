@@ -20,7 +20,7 @@
           {
             "group": "Getting Started",
             "pages": [
-              "index",
+              "index (1)",
               "quickstart"
             ]
           },
@@ -35,17 +35,16 @@
             "pages": [
               "rates/overview",
               "rates/quickstart",
-              "rates/ai-agents",
-              "rates/locations",
-              "rates/methodology",
               "rates/buying-group-and-public-plans",
+              "rates/locations",
+              "rates/ai-agents",
+              "rates/methodology-1",
               "rates/errors-and-warnings",
               "rates/networks-and-cities"
             ]
           },
           {
             "group": "Rates API reference",
-            "openapi": "/openapi-rates.yaml",
             "pages": [
               "documentation/rates-api-reference/get-rates"
             ]
