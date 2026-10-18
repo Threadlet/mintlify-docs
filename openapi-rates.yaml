@@ -554,6 +554,7 @@ components:
           enum:
           - termina_offer
           - cdr
+          - null
         network:
           type: string
           description: Network slug.
@@ -664,6 +665,7 @@ components:
           enum:
           - termina_offer
           - cdr
+          - null
         network:
           type: string
           description: Network slug the plan applies to.
@@ -694,6 +696,7 @@ components:
           type: &id003
           - integer
           - 'null'
+          description: Contract term in months. Null for buying group rates, which are open plans with no fixed term and no exit fees.
         exit_fee_inc_gst:
           type: *id002
         customer_type_verified:
