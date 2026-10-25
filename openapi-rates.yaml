@@ -682,7 +682,7 @@ components:
           description: Public CDR plans only. A Termina page where the business checks its details and signs up to
             this plan in one step. Switching to a plan you found is free; Termina only earns a share of the saving if
             it finds a lower rate. Null for buying group rates, and until switching is available.
-          example: https://app.termina.io/switch?plan_id=BLU123456MRE1&network=united-energy
+          example: https://app.termina.io/switch?plan_id=BLU123456MRE1&network=united-energy&retailer=blue-nrg
         network:
           type: string
           description: Network slug the plan applies to.
