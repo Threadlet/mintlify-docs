@@ -135,6 +135,15 @@ paths:
           - public
           - termina_buying_group
           default: all
+      - name: retailer
+        in: query
+        description: One retailer's public plans only, by slug (the retailer name in lower case, each run of other
+          characters as one hyphen, e.g. `blue-nrg`). Buying group rates are never included, because their retailer
+          isn't named.
+        schema:
+          type: string
+          pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+        example: blue-nrg
       - name: limit
         in: query
         description: Plans per page (1 to 50).
@@ -210,8 +219,8 @@ paths:
                     offer_source: public
                     retailer: Future x Power
                     plan_name: SME Cable Small Biz 25
-                    plan_id: termina-offer-12345
-                    plan_id_type: termina_offer
+                    plan_id: FXP123456MRE1
+                    plan_id_type: cdr
                     network: ausgrid
                     tariff_type: flat
                     annual_cost_inc_gst: 3413
@@ -236,8 +245,8 @@ paths:
                   cheapest_public_by_retailer:
                   - retailer: Future x Power
                     plan_name: SME Cable Small Biz 25
-                    plan_id: termina-offer-12345
-                    plan_id_type: termina_offer
+                    plan_id: FXP123456MRE1
+                    plan_id_type: cdr
                     network: ausgrid
                     tariff_type: flat
                     annual_cost_inc_gst: 3413
@@ -364,6 +373,7 @@ components:
               - invalid_max_demand_kw
               - invalid_usage_shares
               - invalid_offer_source
+              - invalid_retailer
               - invalid_limit
               - invalid_cursor
               - distributor_location_mismatch
@@ -547,7 +557,7 @@ components:
           description: Retailer's plan name.
         plan_id:
           type: *id001
-          description: Plan identifier. `termina-offer-…` until CDR plan IDs are loaded, then the CDR plan ID.
+          description: The plan's Consumer Data Right plan ID (`planId`), for public CDR plans. Null otherwise.
         plan_id_type:
           type: *id001
           description: '`termina_offer` or `cdr`.'
@@ -659,13 +669,20 @@ components:
           description: Plan name, for public plans. Null for buying group rates.
         plan_id:
           type: *id001
-          description: Public plans only. `termina-offer-…` until CDR plan IDs are loaded, then the CDR plan ID.
+          description: Public CDR plans only. The plan's Consumer Data Right plan ID (`planId`), as the retailer
+            publishes it. Pass it to `switch_url` (or the switching API) to switch a business to this plan.
         plan_id_type:
           type: *id001
           enum:
           - termina_offer
           - cdr
           - null
+        switch_url:
+          type: *id001
+          description: Public CDR plans only. A Termina page where the business checks its details and signs up to
+            this plan in one step. Switching to a plan you found is free; Termina only earns a share of the saving if
+            it finds a lower rate. Null for buying group rates, and until switching is available.
+          example: https://app.termina.io/switch?plan_id=BLU123456MRE1&network=united-energy
         network:
           type: string
           description: Network slug the plan applies to.
